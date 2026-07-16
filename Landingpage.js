@@ -1,9 +1,9 @@
 ﻿/* global THREE */
 
-
 (() => {
     const CONFIG = {
-        modelPath: "rob-draco.glb",
+        modelPath: new URL("rob-draco.glb", document.baseURI).href,
+
         colors: {
             ember: 0xff4a0a,
             heat: 0xff7a20,
@@ -11,442 +11,1043 @@
             blueFill: 0x5674a8,
             screen: 0x10253a
         },
+
         breakpoints: {
             mobile: 900
         }
     };
 
-    const supportsFinePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const supportsFinePointer = window.matchMedia(
+        "(hover: hover) and (pointer: fine)"
+    ).matches;
 
-    // =====================
+    const prefersReducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    // =====================================================
     // Custom Cursor
-    // =====================
+    // =====================================================
+
     function initCursor() {
-        const cursor = document.getElementById("cursor");
-        const cursorRing = document.getElementById("cursorRing");
+        const cursor =
+            document.getElementById("cursor");
 
-        if (!supportsFinePointer || !cursor || !cursorRing) return;
+        const cursorRing =
+            document.getElementById("cursorRing");
 
-        document.body.classList.add("cursor-enabled");
+        if (
+            !supportsFinePointer ||
+            !cursor ||
+            !cursorRing
+        ) {
+            return;
+        }
 
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        let ringX = mouseX;
-        let ringY = mouseY;
-        let cursorVisible = false;
+        document.body.classList.add(
+            "cursor-enabled"
+        );
+
+        let mouseX =
+            window.innerWidth / 2;
+
+        let mouseY =
+            window.innerHeight / 2;
+
+        let ringX =
+            mouseX;
+
+        let ringY =
+            mouseY;
+
+        let cursorVisible =
+            false;
 
         const showCursor = () => {
-            if (cursorVisible) return;
-            cursorVisible = true;
-            cursor.style.opacity = "1";
-            cursorRing.style.opacity = "1";
+            if (cursorVisible) {
+                return;
+            }
+
+            cursorVisible =
+                true;
+
+            cursor.style.opacity =
+                "1";
+
+            cursorRing.style.opacity =
+                "1";
         };
 
         const hideCursor = () => {
-            cursorVisible = false;
-            cursor.style.opacity = "0";
-            cursorRing.style.opacity = "0";
+            cursorVisible =
+                false;
+
+            cursor.style.opacity =
+                "0";
+
+            cursorRing.style.opacity =
+                "0";
         };
 
         document.addEventListener(
             "mousemove",
-            (event) => {
-                mouseX = event.clientX;
-                mouseY = event.clientY;
 
-                cursor.style.left = `${mouseX}px`;
-                cursor.style.top = `${mouseY}px`;
+            (event) => {
+                mouseX =
+                    event.clientX;
+
+                mouseY =
+                    event.clientY;
+
+                cursor.style.left =
+                    `${mouseX}px`;
+
+                cursor.style.top =
+                    `${mouseY}px`;
+
                 showCursor();
             },
-            { passive: true }
+
+            {
+                passive: true
+            }
         );
 
-        document.addEventListener("mouseleave", hideCursor, { passive: true });
+        document.addEventListener(
+            "mouseleave",
+            hideCursor,
+            {
+                passive: true
+            }
+        );
 
         function animateCursor() {
-            ringX += (mouseX - ringX) * 0.14;
-            ringY += (mouseY - ringY) * 0.14;
+            ringX +=
+                (
+                    mouseX -
+                    ringX
+                ) *
+                0.14;
 
-            cursorRing.style.left = `${ringX}px`;
-            cursorRing.style.top = `${ringY}px`;
+            ringY +=
+                (
+                    mouseY -
+                    ringY
+                ) *
+                0.14;
 
-            requestAnimationFrame(animateCursor);
+            cursorRing.style.left =
+                `${ringX}px`;
+
+            cursorRing.style.top =
+                `${ringY}px`;
+
+            requestAnimationFrame(
+                animateCursor
+            );
         }
 
         animateCursor();
 
-        document.querySelectorAll("a, button, .callout, .spec-card").forEach((element) => {
-            element.addEventListener("mouseenter", () => {
-                cursorRing.style.width = "56px";
-                cursorRing.style.height = "56px";
-                cursorRing.style.borderColor = "rgba(255,74,10,0.85)";
-            });
+        document
+            .querySelectorAll(
+                "a, button, .callout, .spec-card"
+            )
+            .forEach(
+                (element) => {
+                    element.addEventListener(
+                        "mouseenter",
 
-            element.addEventListener("mouseleave", () => {
-                cursorRing.style.width = "36px";
-                cursorRing.style.height = "36px";
-                cursorRing.style.borderColor = "rgba(255,74,10,0.5)";
-            });
-        });
+                        () => {
+                            cursorRing.style.width =
+                                "56px";
+
+                            cursorRing.style.height =
+                                "56px";
+
+                            cursorRing.style.borderColor =
+                                "rgba(255,74,10,0.85)";
+                        }
+                    );
+
+                    element.addEventListener(
+                        "mouseleave",
+
+                        () => {
+                            cursorRing.style.width =
+                                "36px";
+
+                            cursorRing.style.height =
+                                "36px";
+
+                            cursorRing.style.borderColor =
+                                "rgba(255,74,10,0.5)";
+                        }
+                    );
+                }
+            );
     }
 
-    // =====================
+    // =====================================================
     // Reveal on Scroll
-    // =====================
+    // =====================================================
+
     function initReveal() {
-        const revealElements = document.querySelectorAll(".reveal");
+        const revealElements =
+            document.querySelectorAll(
+                ".reveal"
+            );
 
-        if (!revealElements.length) return;
-
-        if (!("IntersectionObserver" in window) || prefersReducedMotion) {
-            revealElements.forEach((element) => element.classList.add("visible"));
+        if (!revealElements.length) {
             return;
         }
 
-        const revealObserver = new IntersectionObserver(
-            (entries, observer) => {
-                entries.forEach((entry) => {
-                    if (!entry.isIntersecting) return;
+        if (
+            !(
+                "IntersectionObserver" in
+                window
+            ) ||
+            prefersReducedMotion
+        ) {
+            revealElements.forEach(
+                (element) => {
+                    element.classList.add(
+                        "visible"
+                    );
+                }
+            );
 
-                    entry.target.classList.add("visible");
-                    observer.unobserve(entry.target);
-                });
-            },
-            {
-                threshold: 0.14,
-                rootMargin: "0px 0px -40px 0px"
+            return;
+        }
+
+        const revealObserver =
+            new IntersectionObserver(
+                (
+                    entries,
+                    observer
+                ) => {
+                    entries.forEach(
+                        (entry) => {
+                            if (
+                                !entry.isIntersecting
+                            ) {
+                                return;
+                            }
+
+                            entry.target
+                                .classList
+                                .add(
+                                    "visible"
+                                );
+
+                            observer.unobserve(
+                                entry.target
+                            );
+                        }
+                    );
+                },
+
+                {
+                    threshold:
+                        0.14,
+
+                    rootMargin:
+                        "0px 0px -40px 0px"
+                }
+            );
+
+        revealElements.forEach(
+            (element) => {
+                revealObserver.observe(
+                    element
+                );
             }
         );
-
-        revealElements.forEach((element) => revealObserver.observe(element));
     }
 
-    // =====================
-    // THREE shared helpers
-    // =====================
+    // =====================================================
+    // Three shared helpers
+    // =====================================================
+
     function hasThree() {
         return (
-            typeof THREE !== "undefined" &&
-            typeof THREE.GLTFLoader !== "undefined" &&
-            typeof THREE.DRACOLoader !== "undefined"
+            typeof THREE !==
+            "undefined" &&
+
+            typeof THREE.GLTFLoader !==
+            "undefined" &&
+
+            typeof THREE.DRACOLoader !==
+            "undefined"
         );
     }
 
-    function setStatus(id, message, state = "loading") {
-        const element = document.getElementById(id);
-        if (!element) return;
+    function setStatus(
+        id,
+        message,
+        state = "loading"
+    ) {
+        const element =
+            document.getElementById(
+                id
+            );
 
-        element.textContent = message;
-        element.classList.toggle("is-hidden", state === "hidden");
-        element.classList.toggle("is-error", state === "error");
+        if (!element) {
+            return;
+        }
+
+        element.textContent =
+            message;
+
+        element.classList.toggle(
+            "is-hidden",
+            state === "hidden"
+        );
+
+        element.classList.toggle(
+            "is-error",
+            state === "error"
+        );
     }
 
-    function fitModelToView(model, size = 3.2) {
-        const box = new THREE.Box3().setFromObject(model);
-        const boxSize = new THREE.Vector3();
-        const boxCenter = new THREE.Vector3();
+    function fitModelToView(
+        model,
+        size = 3.2
+    ) {
+        const box =
+            new THREE.Box3()
+                .setFromObject(
+                    model
+                );
 
-        box.getSize(boxSize);
-        box.getCenter(boxCenter);
+        const boxSize =
+            new THREE.Vector3();
 
-        const maxAxis = Math.max(boxSize.x, boxSize.y, boxSize.z) || 1;
-        const scale = size / maxAxis;
+        const boxCenter =
+            new THREE.Vector3();
 
-        model.scale.setScalar(scale);
+        box.getSize(
+            boxSize
+        );
 
-        box.setFromObject(model);
-        box.getCenter(boxCenter);
-        model.position.sub(boxCenter);
+        box.getCenter(
+            boxCenter
+        );
 
-        return { scale, boxSize };
+        const maxAxis =
+            Math.max(
+                boxSize.x,
+                boxSize.y,
+                boxSize.z
+            ) || 1;
+
+        const scale =
+            size /
+            maxAxis;
+
+        model.scale.setScalar(
+            scale
+        );
+
+        box.setFromObject(
+            model
+        );
+
+        box.getCenter(
+            boxCenter
+        );
+
+        model.position.sub(
+            boxCenter
+        );
+
+        return {
+            scale,
+            boxSize
+        };
     }
 
-    function cloneMaterial(material) {
-        if (!material) return material;
-        return Array.isArray(material)
-            ? material.map((item) => (item ? item.clone() : item))
+    function cloneMaterial(
+        material
+    ) {
+        if (!material) {
+            return material;
+        }
+
+        return Array.isArray(
+            material
+        )
+            ? material.map(
+                (item) =>
+                    item
+                        ? item.clone()
+                        : item
+            )
+
             : material.clone();
     }
 
-    function applyPremiumMaterials(root) {
-        root.traverse((child) => {
-            if (!child.isMesh) return;
-
-            child.castShadow = true;
-            child.receiveShadow = true;
-
-            if (!child.material) return;
-            child.material = cloneMaterial(child.material);
-
-            const materials = Array.isArray(child.material) ? child.material : [child.material];
-
-            materials.forEach((material) => {
-                if (!material) return;
-
-                material.needsUpdate = true;
-                /*
- * قوة انعكاس الاستوديو على خامات PBR.
- */
+    function applyPremiumMaterials(
+        root
+    ) {
+        root.traverse(
+            (child) => {
                 if (
-                    "envMapIntensity" in material
+                    !child.isMesh
                 ) {
-                    material.envMapIntensity =
-                        1.25;
+                    return;
                 }
 
-                if ("metalness" in material) {
-                    material.metalness = Math.min(1, Math.max(0, material.metalness ?? 0.65));
+                child.castShadow =
+                    true;
+
+                child.receiveShadow =
+                    true;
+
+                if (
+                    !child.material
+                ) {
+                    return;
                 }
 
-                if ("roughness" in material) {
-                    material.roughness = Math.min(1, Math.max(0.08, material.roughness ?? 0.35));
-                }
+                child.material =
+                    cloneMaterial(
+                        child.material
+                    );
 
-                const name = `${child.name} ${material.name || ""}`.toLowerCase();
+                const materials =
+                    Array.isArray(
+                        child.material
+                    )
+                        ? child.material
+                        : [
+                            child.material
+                        ];
 
-                const looksLikeGlass =
-                    name.includes("glass") ||
-                    name.includes("screen") ||
-                    name.includes("display");
+                materials.forEach(
+                    (material) => {
+                        if (!material) {
+                            return;
+                        }
 
-                const looksLikeHeat =
-                    name.includes("red") ||
-                    name.includes("heat") ||
-                    name.includes("light") ||
-                    name.includes("led") ||
-                    name.includes("glow");
+                        material.needsUpdate =
+                            true;
 
-                if (looksLikeGlass) {
-                    if ("transparent" in material) material.transparent = true;
-                    if ("opacity" in material) material.opacity = 0.88;
-                    if ("metalness" in material) material.metalness = 0.15;
-                    if ("roughness" in material) material.roughness = 0.02;
-                    if ("emissive" in material) material.emissive = new THREE.Color(CONFIG.colors.screen);
-                    if ("emissiveIntensity" in material) material.emissiveIntensity = 0.8;
-                }
+                        if (
+                            "envMapIntensity" in
+                            material
+                        ) {
+                            material.envMapIntensity =
+                                1.25;
+                        }
 
-                if (looksLikeHeat) {
-                    /*
-                     * اللون الأساسي يصبح أحمر داكنًا،
-                     * والإضاءة المنبعثة تكون برتقالية.
-                     * هذا يمنع ظهور ألواح التسخين باللون الوردي الفاتح.
-                     */
-                    if ("color" in material) {
-                        material.color.set(0x260701);
+                        if (
+                            "metalness" in
+                            material
+                        ) {
+                            material.metalness =
+                                Math.min(
+                                    1,
+
+                                    Math.max(
+                                        0,
+
+                                        material
+                                            .metalness ??
+                                        0.65
+                                    )
+                                );
+                        }
+
+                        if (
+                            "roughness" in
+                            material
+                        ) {
+                            material.roughness =
+                                Math.min(
+                                    1,
+
+                                    Math.max(
+                                        0.08,
+
+                                        material
+                                            .roughness ??
+                                        0.35
+                                    )
+                                );
+                        }
+
+                        const name =
+                            `${child.name} ${material.name || ""}`
+                                .toLowerCase();
+
+                        const looksLikeGlass =
+                            name.includes(
+                                "glass"
+                            ) ||
+
+                            name.includes(
+                                "screen"
+                            ) ||
+
+                            name.includes(
+                                "display"
+                            );
+
+                        const looksLikeHeat =
+                            name.includes(
+                                "red"
+                            ) ||
+
+                            name.includes(
+                                "heat"
+                            ) ||
+
+                            name.includes(
+                                "light"
+                            ) ||
+
+                            name.includes(
+                                "led"
+                            ) ||
+
+                            name.includes(
+                                "glow"
+                            );
+
+                        if (
+                            looksLikeGlass
+                        ) {
+                            if (
+                                "transparent" in
+                                material
+                            ) {
+                                material.transparent =
+                                    true;
+                            }
+
+                            if (
+                                "opacity" in
+                                material
+                            ) {
+                                material.opacity =
+                                    0.88;
+                            }
+
+                            if (
+                                "metalness" in
+                                material
+                            ) {
+                                material.metalness =
+                                    0.15;
+                            }
+
+                            if (
+                                "roughness" in
+                                material
+                            ) {
+                                material.roughness =
+                                    0.02;
+                            }
+
+                            if (
+                                "emissive" in
+                                material
+                            ) {
+                                material.emissive =
+                                    new THREE.Color(
+                                        CONFIG
+                                            .colors
+                                            .screen
+                                    );
+                            }
+
+                            if (
+                                "emissiveIntensity" in
+                                material
+                            ) {
+                                material.emissiveIntensity =
+                                    0.8;
+                            }
+                        }
+
+                        if (
+                            looksLikeHeat
+                        ) {
+                            if (
+                                "color" in
+                                material
+                            ) {
+                                material.color.set(
+                                    0x260701
+                                );
+                            }
+
+                            if (
+                                "emissive" in
+                                material
+                            ) {
+                                material.emissive.set(
+                                    0xff4a0a
+                                );
+                            }
+
+                            if (
+                                "emissiveIntensity" in
+                                material
+                            ) {
+                                material.emissiveIntensity =
+                                    1.35;
+                            }
+
+                            if (
+                                "metalness" in
+                                material
+                            ) {
+                                material.metalness =
+                                    0.05;
+                            }
+
+                            if (
+                                "roughness" in
+                                material
+                            ) {
+                                material.roughness =
+                                    0.45;
+                            }
+                        }
                     }
-
-                    if ("emissive" in material) {
-                        material.emissive.set(0xff4a0a);
-                    }
-
-                    if ("emissiveIntensity" in material) {
-                        material.emissiveIntensity = 1.35;
-                    }
-
-                    if ("metalness" in material) {
-                        material.metalness =
-                            0.05;
-                    }
-
-                    if ("roughness" in material) {
-                        material.roughness =
-                            0.45;
-                    }
-                }
-            });
-        });
+                );
+            }
+        );
     }
 
-    function addGround(scene, y = -1.55) {
-        const ground = new THREE.Mesh(
-            new THREE.CircleGeometry(6, 64),
-            new THREE.MeshStandardMaterial({
-                color: 0x090b0d,
-                metalness: 0.15,
-                roughness: 0.82,
-                transparent: true,
-                opacity: 0.08
-            })
-        );
+    function createParticles(
+        scene,
+        count
+    ) {
+        const geometry =
+            new THREE.BufferGeometry();
 
-        ground.rotation.x = -Math.PI / 2;
-        ground.position.y = y;
-        ground.receiveShadow = true;
-        scene.add(ground);
+        const positions =
+            new Float32Array(
+                count * 3
+            );
 
-        const ring = new THREE.Mesh(
-            new THREE.RingGeometry(2.3, 2.42, 80),
-            new THREE.MeshBasicMaterial({
-                color: CONFIG.colors.ember,
-                transparent: true,
-                opacity: 0.42,
-                side: THREE.DoubleSide
-            })
-        );
+        const velocities =
+            new Float32Array(
+                count
+            );
 
-        ring.rotation.x = -Math.PI / 2;
-        ring.position.y = y + 0.02;
-        scene.add(ring);
+        for (
+            let index = 0;
+            index < count;
+            index += 1
+        ) {
+            positions[
+                index * 3
+            ] =
+                (
+                    Math.random() -
+                    0.5
+                ) *
+                2.1;
 
-        return { ground, ring };
-    }
+            positions[
+                index * 3 + 1
+            ] =
+                Math.random() *
+                2.2 -
+                0.2;
 
-    function createParticles(scene, count) {
-        const geometry = new THREE.BufferGeometry();
-        const positions = new Float32Array(count * 3);
-        const velocities = new Float32Array(count);
+            positions[
+                index * 3 + 2
+            ] =
+                (
+                    Math.random() -
+                    0.5
+                ) *
+                1.3;
 
-        for (let index = 0; index < count; index += 1) {
-            positions[index * 3] = (Math.random() - 0.5) * 2.1;
-            positions[index * 3 + 1] = Math.random() * 2.2 - 0.2;
-            positions[index * 3 + 2] = (Math.random() - 0.5) * 1.3;
-            velocities[index] = 0.0018 + Math.random() * 0.0026;
+            velocities[
+                index
+            ] =
+                0.0018 +
+                Math.random() *
+                0.0026;
         }
 
-        geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-        geometry.userData.velocities = velocities;
+        geometry.setAttribute(
+            "position",
 
-        const points = new THREE.Points(
-            geometry,
-            new THREE.PointsMaterial({
-                color: CONFIG.colors.heat,
-                size: 0.028,
-                transparent: true,
-                opacity: 0.28,
-                sizeAttenuation: true
-            })
+            new THREE.BufferAttribute(
+                positions,
+                3
+            )
         );
 
-        scene.add(points);
+        geometry.userData.velocities =
+            velocities;
+
+        const points =
+            new THREE.Points(
+                geometry,
+
+                new THREE.PointsMaterial({
+                    color:
+                        CONFIG
+                            .colors
+                            .heat,
+
+                    size:
+                        0.028,
+
+                    transparent:
+                        true,
+
+                    opacity:
+                        0.28,
+
+                    sizeAttenuation:
+                        true
+                })
+            );
+
+        scene.add(
+            points
+        );
+
         return points;
     }
 
-    function updateParticles(points) {
-        const positionAttribute = points.geometry.attributes.position;
-        const positions = positionAttribute.array;
-        const velocities = points.geometry.userData.velocities;
+    function updateParticles(
+        points
+    ) {
+        const positionAttribute =
+            points
+                .geometry
+                .attributes
+                .position;
 
-        for (let index = 0; index < positions.length / 3; index += 1) {
-            positions[index * 3 + 1] += velocities[index];
-            positions[index * 3] += Math.sin(index + performance.now() * 0.001) * 0.00035;
+        const positions =
+            positionAttribute.array;
 
-            if (positions[index * 3 + 1] > 2.3) {
-                positions[index * 3 + 1] = -0.3;
-                positions[index * 3] = (Math.random() - 0.5) * 2.1;
+        const velocities =
+            points
+                .geometry
+                .userData
+                .velocities;
+
+        for (
+            let index = 0;
+            index <
+            positions.length / 3;
+            index += 1
+        ) {
+            positions[
+                index * 3 + 1
+            ] +=
+                velocities[
+                index
+                ];
+
+            positions[
+                index * 3
+            ] +=
+                Math.sin(
+                    index +
+                    performance.now() *
+                    0.001
+                ) *
+                0.00035;
+
+            if (
+                positions[
+                index * 3 + 1
+                ] >
+                2.3
+            ) {
+                positions[
+                    index * 3 + 1
+                ] =
+                    -0.3;
+
+                positions[
+                    index * 3
+                ] =
+                    (
+                        Math.random() -
+                        0.5
+                    ) *
+                    2.1;
             }
         }
 
-        positionAttribute.needsUpdate = true;
+        positionAttribute.needsUpdate =
+            true;
     }
 
-    function setupVisibilityLoop(section, animateFrame) {
-        let frameId = null;
-        let active = true;
+    function setupVisibilityLoop(
+        section,
+        animateFrame
+    ) {
+        let frameId =
+            null;
 
-        const renderLoop = () => {
-            if (!active) {
-                frameId = null;
-                return;
-            }
+        let active =
+            true;
 
-            frameId = requestAnimationFrame(renderLoop);
-            animateFrame();
-        };
+        const renderLoop =
+            () => {
+                if (!active) {
+                    frameId =
+                        null;
 
-        const start = () => {
-            active = true;
-            if (frameId === null) frameId = requestAnimationFrame(renderLoop);
-        };
+                    return;
+                }
 
-        const stop = () => {
-            active = false;
-        };
+                frameId =
+                    requestAnimationFrame(
+                        renderLoop
+                    );
 
-        if ("IntersectionObserver" in window) {
-            const observer = new IntersectionObserver(
-                ([entry]) => {
-                    if (entry.isIntersecting && !document.hidden) {
-                        start();
-                    } else {
-                        stop();
+                animateFrame();
+            };
+
+        const start =
+            () => {
+                active =
+                    true;
+
+                if (
+                    frameId ===
+                    null
+                ) {
+                    frameId =
+                        requestAnimationFrame(
+                            renderLoop
+                        );
+                }
+            };
+
+        const stop =
+            () => {
+                active =
+                    false;
+            };
+
+        if (
+            "IntersectionObserver" in
+            window
+        ) {
+            const observer =
+                new IntersectionObserver(
+                    (
+                        [entry]
+                    ) => {
+                        if (
+                            entry.isIntersecting &&
+                            !document.hidden
+                        ) {
+                            start();
+                        } else {
+                            stop();
+                        }
+                    },
+
+                    {
+                        threshold:
+                            0.05
                     }
-                },
-                { threshold: 0.05 }
-            );
+                );
 
-            observer.observe(section);
+            observer.observe(
+                section
+            );
         }
 
-        document.addEventListener("visibilitychange", () => {
-            if (document.hidden) stop();
-            else start();
-        });
+        document.addEventListener(
+            "visibilitychange",
+
+            () => {
+                if (
+                    document.hidden
+                ) {
+                    stop();
+                } else {
+                    start();
+                }
+            }
+        );
 
         start();
     }
 
-    let robotModelPromise = null;
+    // =====================================================
+    // Robot loader
+    // =====================================================
+
+    let robotModelPromise =
+        null;
 
     function loadRobotModel() {
-        if (robotModelPromise) {
+        if (
+            robotModelPromise
+        ) {
             return robotModelPromise;
         }
 
-        robotModelPromise = new Promise((resolve, reject) => {
+        const candidateUrls =
+            Array.from(
+                new Set([
+                    CONFIG.modelPath,
 
-            // Loader الخاص بفك ضغط Draco
-            const dracoLoader = new THREE.DRACOLoader();
+                    new URL(
+                        "./rob-draco.glb",
+                        window.location.href
+                    ).href,
 
-            dracoLoader.setDecoderPath(
-                "https://www.gstatic.com/draco/v1/decoders/"
+                    new URL(
+                        "/ip_robot/rob-draco.glb",
+                        window.location.origin
+                    ).href
+                ])
             );
 
-            // GLTF Loader
-            const loader = new THREE.GLTFLoader();
+        robotModelPromise =
+            new Promise(
+                (
+                    resolve,
+                    reject
+                ) => {
+                    const dracoLoader =
+                        new THREE.DRACOLoader();
 
-            // ربط Draco مع GLTF Loader
-            loader.setDRACOLoader(dracoLoader);
-
-            loader.load(
-                CONFIG.modelPath,
-
-                (gltf) => {
-                    resolve(gltf);
-                },
-
-                (xhr) => {
-                    if (xhr.total > 0) {
-                        const percent = Math.round(
-                            (xhr.loaded / xhr.total) * 100
-                        );
-
-                        console.log(
-                            `Robot loading: ${percent}%`
-                        );
-                    }
-                },
-
-                (error) => {
-                    console.error(
-                        "Failed to load Draco robot model:",
-                        error
+                    dracoLoader.setDecoderPath(
+                        "https://www.gstatic.com/draco/versioned/decoders/1.5.7/"
                     );
 
-                    reject(error);
+                    dracoLoader.setDecoderConfig({
+                        type:
+                            "js"
+                    });
+
+                    const loader =
+                        new THREE.GLTFLoader();
+
+                    loader.setDRACOLoader(
+                        dracoLoader
+                    );
+
+                    let currentIndex =
+                        0;
+
+                    const tryNextUrl =
+                        () => {
+                            if (
+                                currentIndex >=
+                                candidateUrls.length
+                            ) {
+                                dracoLoader.dispose?.();
+
+                                robotModelPromise =
+                                    null;
+
+                                reject(
+                                    new Error(
+                                        `Robot model could not be loaded from: ${candidateUrls.join(", ")}`
+                                    )
+                                );
+
+                                return;
+                            }
+
+                            const currentUrl =
+                                candidateUrls[
+                                currentIndex
+                                ];
+
+                            currentIndex +=
+                                1;
+
+                            loader.load(
+                                currentUrl,
+
+                                (
+                                    gltf
+                                ) => {
+                                    dracoLoader.dispose?.();
+
+                                    resolve(
+                                        gltf
+                                    );
+                                },
+
+                                (
+                                    xhr
+                                ) => {
+                                    if (
+                                        xhr.total >
+                                        0
+                                    ) {
+                                        const percent =
+                                            Math.round(
+                                                (
+                                                    xhr.loaded /
+                                                    xhr.total
+                                                ) *
+                                                100
+                                            );
+
+                                        console.log(
+                                            `Robot loading: ${percent}%`
+                                        );
+                                    }
+                                },
+
+                                (
+                                    error
+                                ) => {
+                                    console.warn(
+                                        "Robot model load attempt failed:",
+
+                                        currentUrl,
+
+                                        error
+                                    );
+
+                                    tryNextUrl();
+                                }
+                            );
+                        };
+
+                    tryNextUrl();
                 }
             );
-        });
 
-        return robotModelPromise;
-    }
-    function cloneRobotScene(gltf) {
-        return gltf.scene.clone(true);
+        return robotModelPromise.catch(
+            (
+                error
+            ) => {
+                robotModelPromise =
+                    null;
+
+                throw error;
+            }
+        );
     }
 
-    // =====================
-    // Hero 3D
-    // =====================
+    function cloneRobotScene(
+        gltf
+    ) {
+        return gltf.scene.clone(
+            true
+        );
+    }
+
+    // =====================================================
+    // Renderer config
+    // =====================================================
 
     function configureRobotRenderer(
         renderer,
@@ -458,11 +1059,9 @@
         renderer.shadowMap.type =
             THREE.PCFSoftShadowMap;
 
-        /*
-         * دعم إصدارات Three.js الجديدة والقديمة.
-         */
         if (
-            "outputColorSpace" in renderer &&
+            "outputColorSpace" in
+            renderer &&
             THREE.SRGBColorSpace
         ) {
             renderer.outputColorSpace =
@@ -475,25 +1074,21 @@
         renderer.toneMapping =
             THREE.ACESFilmicToneMapping;
 
-        /*
-         * لا ترفعه كثيرًا حتى لا يصبح المعدن أبيض محروقًا.
-         */
         renderer.toneMappingExposure =
             1.02;
     }
 
+    // =====================================================
+    // Studio environment
+    // =====================================================
 
-    /*
-     * إنشاء استوديو افتراضي ينعكس على معدن الروبوت.
-     *
-     * هذه ليست خلفية مرئية.
-     * هي فقط Environment Reflection.
-     */
     function createRobotStudioEnvironment(
         renderer,
         scene
     ) {
-        if (!THREE.PMREMGenerator) {
+        if (
+            !THREE.PMREMGenerator
+        ) {
             return null;
         }
 
@@ -510,9 +1105,6 @@
                 0x030303
             );
 
-        /*
-         * غرفة داكنة تحيط بالمجسم.
-         */
         const room =
             new THREE.Mesh(
                 new THREE.BoxGeometry(
@@ -522,8 +1114,11 @@
                 ),
 
                 new THREE.MeshBasicMaterial({
-                    color: 0x050403,
-                    side: THREE.BackSide
+                    color:
+                        0x050403,
+
+                    side:
+                        THREE.BackSide
                 })
             );
 
@@ -543,10 +1138,6 @@
                     color
                 );
 
-            /*
-             * يسمح بقيمة إضاءة أعلى من الأبيض العادي
-             * داخل Environment Map.
-             */
             panelColor.multiplyScalar(
                 intensity
             );
@@ -559,8 +1150,11 @@
                     ),
 
                     new THREE.MeshBasicMaterial({
-                        color: panelColor,
-                        side: THREE.DoubleSide
+                        color:
+                            panelColor,
+
+                        side:
+                            THREE.DoubleSide
                     })
                 );
 
@@ -581,15 +1175,19 @@
             );
         }
 
-        /*
-         * Softbox رئيسي أبيض دافئ.
-         * يصنع الانعكاس الأبيض الطويل على الستانلس.
-         */
         addReflectionPanel({
-            color: 0xffead7,
-            intensity: 3.2,
-            width: 4.5,
-            height: 7,
+            color:
+                0xffead7,
+
+            intensity:
+                3.2,
+
+            width:
+                4.5,
+
+            height:
+                7,
+
             position: [
                 4.8,
                 3.4,
@@ -597,14 +1195,19 @@
             ]
         });
 
-        /*
-         * Fill بارد وخفيف.
-         */
         addReflectionPanel({
-            color: 0xb9cada,
-            intensity: 1.15,
-            width: 3.5,
-            height: 6,
+            color:
+                0xb9cada,
+
+            intensity:
+                1.15,
+
+            width:
+                3.5,
+
+            height:
+                6,
+
             position: [
                 -4.8,
                 1.5,
@@ -612,16 +1215,21 @@
             ]
         });
 
-        /*
-         * شريط برتقالي خلفي.
-         */
         addReflectionPanel({
             color:
-                CONFIG.colors.ember,
+                CONFIG
+                    .colors
+                    .ember,
 
-            intensity: 2.1,
-            width: 2.2,
-            height: 5.5,
+            intensity:
+                2.1,
+
+            width:
+                2.2,
+
+            height:
+                5.5,
+
             position: [
                 3.2,
                 1.2,
@@ -629,14 +1237,19 @@
             ]
         });
 
-        /*
-         * شريط علوي يعطي انعكاسًا على الأسطح الأفقية.
-         */
         addReflectionPanel({
-            color: 0xffffff,
-            intensity: 1.6,
-            width: 5.5,
-            height: 1.35,
+            color:
+                0xffffff,
+
+            intensity:
+                1.6,
+
+            width:
+                5.5,
+
+            height:
+                1.35,
+
             position: [
                 0,
                 6,
@@ -655,12 +1268,13 @@
 
         pmremGenerator.dispose();
 
-        /*
-         * حذف المجسمات المؤقتة بعد صناعة الانعكاس.
-         */
         environmentScene.traverse(
-            (object) => {
-                if (!object.isMesh) {
+            (
+                object
+            ) => {
+                if (
+                    !object.isMesh
+                ) {
                     return;
                 }
 
@@ -672,7 +1286,9 @@
                     )
                 ) {
                     object.material.forEach(
-                        (material) => {
+                        (
+                            material
+                        ) => {
                             material?.dispose?.();
                         }
                     );
@@ -685,10 +1301,10 @@
         return environmentTarget;
     }
 
+    // =====================================================
+    // Studio lighting
+    // =====================================================
 
-    /*
-     * إضاءة الروبوت الحقيقية.
-     */
     function createRobotStudioLighting(
         scene,
         {
@@ -710,10 +1326,6 @@
             target
         );
 
-        /*
-         * إضاءة عامة ضعيفة جدًا.
-         * وظيفتها منع السواد الكامل فقط.
-         */
         const hemisphere =
             new THREE.HemisphereLight(
                 0xd9e2ed,
@@ -725,17 +1337,21 @@
             hemisphere
         );
 
-        /*
-         * الضوء الرئيسي.
-         * أبيض دافئ ليكون متناسقًا مع الخلفية البنية.
-         */
         const keyLight =
             new THREE.SpotLight(
                 0xffead8,
-                mobile ? 2.3 : 3.6,
+
+                mobile
+                    ? 2.3
+                    : 3.6,
+
                 18,
-                Math.PI / 4.6,
+
+                Math.PI /
+                4.6,
+
                 0.88,
+
                 1.25
             );
 
@@ -752,8 +1368,13 @@
             !mobile;
 
         keyLight.shadow.mapSize.set(
-            mobile ? 1024 : 2048,
-            mobile ? 1024 : 2048
+            mobile
+                ? 1024
+                : 2048,
+
+            mobile
+                ? 1024
+                : 2048
         );
 
         keyLight.shadow.camera.near =
@@ -775,10 +1396,6 @@
             keyLight
         );
 
-        /*
-         * Fill بارد خفيف جدًا.
-         * لا تجعله أزرق قويًا.
-         */
         const fillLight =
             new THREE.DirectionalLight(
                 0xc2d1df,
@@ -795,17 +1412,23 @@
             fillLight
         );
 
-        /*
-         * Rim برتقالي من الخلف.
-         * يفصل حواف الروبوت عن الخلفية السوداء.
-         */
         const rimLight =
             new THREE.SpotLight(
-                CONFIG.colors.ember,
-                mobile ? 2.1 : 3.2,
+                CONFIG
+                    .colors
+                    .ember,
+
+                mobile
+                    ? 2.1
+                    : 3.2,
+
                 15,
-                Math.PI / 4,
+
+                Math.PI /
+                4,
+
                 0.87,
+
                 1.5
             );
 
@@ -822,9 +1445,6 @@
             rimLight
         );
 
-        /*
-         * إضاءة علوية خفيفة.
-         */
         const topLight =
             new THREE.DirectionalLight(
                 0xffffff,
@@ -841,10 +1461,6 @@
             topLight
         );
 
-        /*
-         * وهج داخلي لمنطقة التسخين.
-         * يجب أن يبقى ضعيفًا.
-         */
         const heaterLight =
             new THREE.PointLight(
                 0xff5b22,
@@ -863,9 +1479,6 @@
             heaterLight
         );
 
-        /*
-         * ظل تماس أسفل الروبوت.
-         */
         const shadowFloor =
             new THREE.Mesh(
                 new THREE.CircleGeometry(
@@ -874,14 +1487,20 @@
                 ),
 
                 new THREE.ShadowMaterial({
-                    color: 0x000000,
-                    opacity: 0.22,
-                    transparent: true
+                    color:
+                        0x000000,
+
+                    opacity:
+                        0.22,
+
+                    transparent:
+                        true
                 })
             );
 
         shadowFloor.rotation.x =
-            -Math.PI / 2;
+            -Math.PI /
+            2;
 
         shadowFloor.position.y =
             floorY;
@@ -893,9 +1512,6 @@
             shadowFloor
         );
 
-        /*
-         * الحلقة البرتقالية الخاصة بهوية الموقع.
-         */
         const ring =
             new THREE.Mesh(
                 new THREE.RingGeometry(
@@ -906,20 +1522,31 @@
 
                 new THREE.MeshBasicMaterial({
                     color:
-                        CONFIG.colors.ember,
+                        CONFIG
+                            .colors
+                            .ember,
 
-                    transparent: true,
-                    opacity: 0.24,
-                    side: THREE.DoubleSide,
-                    depthWrite: false
+                    transparent:
+                        true,
+
+                    opacity:
+                        0.24,
+
+                    side:
+                        THREE.DoubleSide,
+
+                    depthWrite:
+                        false
                 })
             );
 
         ring.rotation.x =
-            -Math.PI / 2;
+            -Math.PI /
+            2;
 
         ring.position.y =
-            floorY + 0.015;
+            floorY +
+            0.015;
 
         scene.add(
             ring
@@ -937,25 +1564,62 @@
         };
     }
 
+    // =====================================================
+    // Hero Scene
+    // =====================================================
+
     function initHeroScene() {
-        const canvas = document.getElementById("three-canvas");
-        const section = document.getElementById("hero");
+        const canvas =
+            document.getElementById(
+                "three-canvas"
+            );
 
-        if (!canvas || !section) return;
+        const section =
+            document.getElementById(
+                "hero"
+            );
 
-        if (!hasThree()) {
-            setStatus("hero-model-status", "3D engine failed to load.", "error");
+        if (
+            !canvas ||
+            !section
+        ) {
             return;
         }
 
-        const isMobile = () => window.innerWidth < CONFIG.breakpoints.mobile;
+        if (
+            !hasThree()
+        ) {
+            setStatus(
+                "hero-model-status",
 
-        const renderer = new THREE.WebGLRenderer({
-            canvas,
-            antialias: !isMobile(),
-            alpha: true,
-            powerPreference: "high-performance"
-        });
+                "3D engine failed to load.",
+
+                "error"
+            );
+
+            return;
+        }
+
+        const isMobile =
+            () =>
+                window.innerWidth <
+                CONFIG
+                    .breakpoints
+                    .mobile;
+
+        const renderer =
+            new THREE.WebGLRenderer({
+                canvas,
+
+                antialias:
+                    !isMobile(),
+
+                alpha:
+                    true,
+
+                powerPreference:
+                    "high-performance"
+            });
 
         renderer.setSize(
             window.innerWidth,
@@ -965,7 +1629,10 @@
         renderer.setPixelRatio(
             Math.min(
                 window.devicePixelRatio,
-                isMobile() ? 1.15 : 1.7
+
+                isMobile()
+                    ? 1.15
+                    : 1.7
             )
         );
 
@@ -974,274 +1641,581 @@
             isMobile()
         );
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile() ? 1.15 : 1.7));
-        renderer.shadowMap.enabled = !isMobile();
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-        renderer.outputEncoding = THREE.sRGBEncoding;
-        renderer.toneMapping = THREE.ACESFilmicToneMapping;
-        renderer.toneMappingExposure = 0.96;
+        renderer.shadowMap.enabled =
+            !isMobile();
 
-        const scene = new THREE.Scene();
-        const heroEnvironment =
-            createRobotStudioEnvironment(
-                renderer,
-                scene
-            );
+        renderer.shadowMap.type =
+            THREE.PCFSoftShadowMap;
+
+        renderer.toneMapping =
+            THREE.ACESFilmicToneMapping;
+
+        renderer.toneMappingExposure =
+            0.96;
+
+        const scene =
+            new THREE.Scene();
+
+        createRobotStudioEnvironment(
+            renderer,
+            scene
+        );
 
         const heroLighting =
             createRobotStudioLighting(
                 scene,
+
                 {
-                    mobile: isMobile(),
+                    mobile:
+                        isMobile(),
 
-                    /*
-                     * غيّر هذه القيمة فقط إذا كان
-                     * الظل أعلى أو أسفل قاعدة الروبوت.
-                     */
-                    floorY: -1.65,
+                    floorY:
+                        -1.65,
 
-                    targetY: 0.1
+                    targetY:
+                        0.1
                 }
             );
 
-        const particles = prefersReducedMotion
-            ? null
-            : createParticles(scene, isMobile() ? 32 : 90);
+        const particles =
+            prefersReducedMotion
 
-        const camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, 100);
-        camera.position.set(isMobile() ? 0 : 4.8, 0.9, 9.4);
+                ? null
 
-        
+                : createParticles(
+                    scene,
 
-        const modelGroup = new THREE.Group();
-        scene.add(modelGroup);
+                    isMobile()
+                        ? 32
+                        : 90
+                );
 
-        let model = null;
-        let modelBaseScale = 1;
-        let targetRotY = 0;
-        let currentRotY = 0;
-        let mouseOffsetX = 0;
-        let mouseOffsetY = 0;
-        let scrollY = window.scrollY;
-        let introProgress = prefersReducedMotion ? 1 : 0;
+        const camera =
+            new THREE.PerspectiveCamera(
+                30,
 
-        const updateMouse = (event) => {
-            if (isMobile() || prefersReducedMotion) return;
+                window.innerWidth /
+                window.innerHeight,
 
-            const nx = event.clientX / window.innerWidth - 0.5;
-            const ny = event.clientY / window.innerHeight - 0.5;
+                0.1,
 
-            targetRotY = nx * 0.38;
-            mouseOffsetX = nx * 0.55;
-            mouseOffsetY = ny * 0.28;
-        };
+                100
+            );
 
-        document.addEventListener("mousemove", updateMouse, { passive: true });
-        window.addEventListener("scroll", () => {
-            scrollY = window.scrollY;
-        }, { passive: true });
+        camera.position.set(
+            isMobile()
+                ? 0
+                : 4.8,
+
+            isMobile()
+                ? 0.45
+                : 0.9,
+
+            isMobile()
+                ? 10.8
+                : 9.4
+        );
+
+        const modelGroup =
+            new THREE.Group();
+
+        scene.add(
+            modelGroup
+        );
+
+        let model =
+            null;
+
+        let modelBaseScale =
+            1;
+
+        let targetRotY =
+            0;
+
+        let currentRotY =
+            0;
+
+        let mouseOffsetX =
+            0;
+
+        let mouseOffsetY =
+            0;
+
+        let scrollY =
+            window.scrollY;
+
+        let introProgress =
+            prefersReducedMotion
+                ? 1
+                : 0;
+
+        const updateMouse =
+            (
+                event
+            ) => {
+                if (
+                    isMobile() ||
+                    prefersReducedMotion
+                ) {
+                    return;
+                }
+
+                const nx =
+                    event.clientX /
+                    window.innerWidth -
+                    0.5;
+
+                const ny =
+                    event.clientY /
+                    window.innerHeight -
+                    0.5;
+
+                targetRotY =
+                    nx *
+                    0.38;
+
+                mouseOffsetX =
+                    nx *
+                    0.55;
+
+                mouseOffsetY =
+                    ny *
+                    0.28;
+            };
+
+        document.addEventListener(
+            "mousemove",
+            updateMouse,
+            {
+                passive: true
+            }
+        );
+
+        window.addEventListener(
+            "scroll",
+
+            () => {
+                scrollY =
+                    window.scrollY;
+            },
+
+            {
+                passive: true
+            }
+        );
 
         loadRobotModel()
-            .then((gltf) => {
-                model = cloneRobotScene(gltf);
-                modelGroup.add(model);
+            .then(
+                (
+                    gltf
+                ) => {
+                    model =
+                        cloneRobotScene(
+                            gltf
+                        );
 
-                applyPremiumMaterials(model);
-                fitModelToView(model, isMobile() ? 3 : 3);
+                    modelGroup.add(
+                        model
+                    );
 
-                modelBaseScale = model.scale.x;
-                model.rotation.y = -0.45;
-                model.position.set(isMobile() ? 0 : 2.6, 1.05, 0.15);
+                    applyPremiumMaterials(
+                        model
+                    );
 
-                setStatus("hero-model-status", "", "hidden");
-            })
-            .catch((error) => {
-                console.error("Failed to load rob.glb", error);
-                setStatus("hero-model-status", "3D model unavailable. Check rob.glb path.", "error");
-            });
+                    fitModelToView(
+                        model,
 
-        const clock = new THREE.Clock();
+                        isMobile()
+                            ? 2.55
+                            : 3
+                    );
+
+                    modelBaseScale =
+                        model.scale.x;
+
+                    model.rotation.y =
+                        -0.45;
+
+                    model.position.set(
+                        isMobile()
+                            ? 0
+                            : 2.6,
+
+                        1.05,
+
+                        0.15
+                    );
+
+                    setStatus(
+                        "hero-model-status",
+                        "",
+                        "hidden"
+                    );
+                }
+            )
+
+            .catch(
+                (
+                    error
+                ) => {
+                    console.error(
+                        "Failed to load hero robot model",
+
+                        error
+                    );
+
+                    setStatus(
+                        "hero-model-status",
+
+                        "3D model could not be loaded.",
+
+                        "error"
+                    );
+                }
+            );
+
+        const clock =
+            new THREE.Clock();
 
         function updateHeroLayout() {
-            const mobile = isMobile();
+            const mobile =
+                isMobile();
 
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.15 : 1.7));
-            renderer.shadowMap.enabled = !mobile;
+            renderer.setSize(
+                window.innerWidth,
+                window.innerHeight
+            );
 
-            camera.aspect = window.innerWidth / window.innerHeight;
+            renderer.setPixelRatio(
+                Math.min(
+                    window.devicePixelRatio,
+
+                    mobile
+                        ? 1.15
+                        : 1.7
+                )
+            );
+
+            renderer.shadowMap.enabled =
+                !mobile;
+
+            camera.aspect =
+                window.innerWidth /
+                window.innerHeight;
+
             camera.updateProjectionMatrix();
 
-            if (model) {
-                fitModelToView(model, mobile ? 2.2 : 2.55);
-                modelBaseScale = model.scale.x;
+            camera.position.z =
+                mobile
+                    ? 10.8
+                    : 9.4;
+
+            camera.position.y =
+                mobile
+                    ? 0.45
+                    : 0.9;
+
+            if (
+                model
+            ) {
+                fitModelToView(
+                    model,
+
+                    mobile
+                        ? 2.25
+                        : 2.55
+                );
+
+                modelBaseScale =
+                    model.scale.x;
             }
         }
 
-        let resizeFrame = null;
-        window.addEventListener("resize", () => {
-            if (resizeFrame !== null) cancelAnimationFrame(resizeFrame);
-            resizeFrame = requestAnimationFrame(updateHeroLayout);
-        }, { passive: true });
+        let resizeFrame =
+            null;
 
-        setupVisibilityLoop(section, () => {
-            const t = clock.getElapsedTime();
-            const mobile = isMobile();
+        window.addEventListener(
+            "resize",
 
-            if (model) {
-                introProgress += (1 - introProgress) * 0.035;
-                currentRotY += (targetRotY - currentRotY) * 0.045;
+            () => {
+                if (
+                    resizeFrame !==
+                    null
+                ) {
+                    cancelAnimationFrame(
+                        resizeFrame
+                    );
+                }
 
-                /*
- * مكان الروبوت داخل الـHero.
- *
- * X:
- * موجب = يمين
- * سالب = يسار
- *
- * Y:
- * موجب = أعلى
- * سالب = أسفل
- */
-                const finalX = mobile ? 0 : 1.9;
-                const finalY = mobile ? -0.35 : -1.38;
+                resizeFrame =
+                    requestAnimationFrame(
+                        updateHeroLayout
+                    );
+            },
 
-                const introY = THREE.MathUtils.lerp(
-                    finalY + 0.5,
-                    finalY,
-                    introProgress
+            {
+                passive: true
+            }
+        );
+
+        setupVisibilityLoop(
+            section,
+
+            () => {
+                const t =
+                    clock.getElapsedTime();
+
+                const mobile =
+                    isMobile();
+
+                if (
+                    model
+                ) {
+                    introProgress +=
+                        (
+                            1 -
+                            introProgress
+                        ) *
+                        0.035;
+
+                    currentRotY +=
+                        (
+                            targetRotY -
+                            currentRotY
+                        ) *
+                        0.045;
+
+                    const finalX =
+                        mobile
+                            ? 0
+                            : 1.9;
+
+                    const finalY =
+                        mobile
+                            ? -1.0
+                            : -1.38;
+
+                    const introY =
+                        THREE.MathUtils.lerp(
+                            finalY +
+                            0.5,
+
+                            finalY,
+
+                            introProgress
+                        );
+
+                    const introScale =
+                        THREE.MathUtils.lerp(
+                            modelBaseScale *
+                            0.42,
+
+                            modelBaseScale,
+
+                            introProgress
+                        );
+
+                    const scrollInfluence =
+                        Math.min(
+                            scrollY /
+                            1200,
+
+                            1
+                        );
+
+                    model.scale.setScalar(
+                        introScale
+                    );
+
+                    model.position.x =
+                        finalX +
+                        mouseOffsetX *
+                        (
+                            mobile
+                                ? 0
+                                : 0.12
+                        );
+
+                    model.position.y =
+                        introY +
+                        (
+                            prefersReducedMotion
+
+                                ? 0
+
+                                : Math.sin(
+                                    t *
+                                    0.9
+                                ) *
+                                0.04
+                        );
+
+                    model.position.z =
+                        scrollInfluence *
+                        0.35;
+
+                    model.rotation.x =
+                        -0.04 +
+                        scrollInfluence *
+                        0.08 +
+                        mouseOffsetY *
+                        0.05;
+
+                    model.rotation.y =
+                        -0.45 +
+                        currentRotY +
+                        (
+                            prefersReducedMotion
+
+                                ? 0
+
+                                : Math.sin(
+                                    t *
+                                    0.4
+                                ) *
+                                0.04
+                        );
+                }
+
+                if (
+                    !prefersReducedMotion
+                ) {
+                    heroLighting
+                        .heaterLight
+                        .intensity =
+                        0.55 +
+                        Math.sin(
+                            t *
+                            2.1
+                        ) *
+                        0.045;
+
+                    heroLighting
+                        .rimLight
+                        .intensity =
+                        3.2 +
+                        Math.cos(
+                            t *
+                            0.85
+                        ) *
+                        0.12;
+
+                    heroLighting
+                        .ring
+                        .material
+                        .opacity =
+                        0.22 +
+                        Math.sin(
+                            t *
+                            1.25
+                        ) *
+                        0.035;
+                }
+
+                if (
+                    particles
+                ) {
+                    updateParticles(
+                        particles
+                    );
+                }
+
+                camera.position.x =
+                    (
+                        mobile
+                            ? 0
+                            : 4.8
+                    ) +
+                    mouseOffsetX *
+                    (
+                        mobile
+                            ? 0
+                            : 0.08
+                    );
+
+                camera.position.y =
+                    mobile
+                        ? 0.45
+                        : 0.9 -
+                        Math.min(
+                            scrollY *
+                            0.00035,
+
+                            0.28
+                        );
+
+                camera.lookAt(
+                    mobile
+                        ? 0
+                        : 1.55,
+
+                    mobile
+                        ? -0.55
+                        : 0.18,
+
+                    0
                 );
-                const introScale = THREE.MathUtils.lerp(modelBaseScale * 0.42, modelBaseScale, introProgress);
-                const scrollInfluence = Math.min(scrollY / 1200, 1);
 
-                model.scale.setScalar(introScale);
-                model.position.x = finalX + mouseOffsetX * (mobile ? 0 : 0.12);
-                model.position.y = introY + (prefersReducedMotion ? 0 : Math.sin(t * 0.9) * 0.04);
-                model.position.z = scrollInfluence * 0.35;
-                model.rotation.x = -0.04 + scrollInfluence * 0.08 + mouseOffsetY * 0.05;
-                model.rotation.y = -0.45 + currentRotY + (prefersReducedMotion ? 0 : Math.sin(t * 0.4) * 0.04);
+                renderer.render(
+                    scene,
+                    camera
+                );
             }
-
-            if (!prefersReducedMotion) {
-                /*
-                 * تغيرات طفيفة فقط.
-                 * لا نريد إضاءة نابضة بشكل مبالغ.
-                 */
-                heroLighting.heaterLight.intensity =
-                    0.55 +
-                    Math.sin(t * 2.1) *
-                    0.045;
-
-                heroLighting.rimLight.intensity =
-                    3.2 +
-                    Math.cos(t * 0.85) *
-                    0.12;
-
-                heroLighting.ring.material.opacity =
-                    0.22 +
-                    Math.sin(t * 1.25) *
-                    0.035;
-            }
-
-            if (particles) updateParticles(particles);
-
-            camera.position.x = (mobile ? 0 : 4.8) + mouseOffsetX * (mobile ? 0 : 0.08);
-            camera.position.y = 0.9 - Math.min(scrollY * 0.00035, 0.28);
-            camera.lookAt(mobile ? 0 : 1.55, 0.18, 0);
-
-            renderer.render(scene, camera);
-            
-        });
+        );
     }
 
     // =====================================================
-    // SPOTLIGHT MANUAL SETTINGS
-    // عدّل القيم الموجودة هنا فقط
+    // Spotlight settings
     // =====================================================
 
     const SPOTLIGHT_CONFIG = {
-        /*
-         * true:
-         * يسمح لك بسحب الدوائر والنصوص بالماوس.
-         *
-         * false:
-         * وضع العرض النهائي للزائر.
-         */
-        editMode: true,
+        editMode:
+            false,
 
-        /*
-         * يتم حفظ الأماكن التي تسحبها داخل المتصفح
-         * حتى بعد Refresh.
-         */
-        storageKey: "iprobotx-spotlight-hotspots-v1",
+        storageKey:
+            "iprobotx-spotlight-hotspots-v1",
 
         model: {
-            /*
-             * حجم الروبوت.
-             * رقم أصغر = روبوت أصغر.
-             * رقم أكبر = روبوت أكبر.
-             */
-            desktopSize: 2.9,
-            tabletSize: 2.55,
-            mobileSize: 2.1,
+            desktopSize:
+                2.9,
 
-            /*
-             * مكان الروبوت كاملًا داخل الإطار.
-             */
+            tabletSize:
+                2.55,
+
+            mobileSize:
+                2.1,
+
             position: {
-                x: 0,
-                y: -0.08,
-                z: 0
+                x:
+                    0,
+
+                y:
+                    -0.08,
+
+                z:
+                    0
             },
 
-            /*
-             * زاوية الروبوت.
-             */
-            rotationY: -0.16,
+            rotationY:
+                -0.16,
 
-            /*
-             * بُعد الكاميرا.
-             * رقم أكبر = الروبوت أبعد وأصغر.
-             */
-            cameraDesktopZ: 7.4,
-            cameraTabletZ: 7.9,
-            cameraMobileZ: 8.4,
+            cameraDesktopZ:
+                7.4,
 
-            /*
-             * حركة خفيفة للروبوت في وضع العرض النهائي.
-             */
-            automaticMotion: true
+            cameraTabletZ:
+                7.9,
+
+            cameraMobileZ:
+                8.4,
+
+            automaticMotion:
+                true
         },
-
-        /*
-         * anchor:
-         * مكان النقطة الأصلي على المجسم.
-         *
-         * القيم من 0 إلى 1:
-         *
-         * x:
-         * 0 = أقصى اليسار
-         * 1 = أقصى اليمين
-         *
-         * y:
-         * 0 = أسفل الروبوت
-         * 1 = أعلى الروبوت
-         *
-         * z:
-         * 0 = خلف الروبوت
-         * 1 = أمام الروبوت
-         *
-         * nodeOffset:
-         * تحريك الدائرة بالبكسل.
-         *
-         * labelOffset:
-         * تحريك مستطيل النص انطلاقًا من الدائرة.
-         */
 
         hotspots: [
             {
-                title: "ŞASİ",
+                title:
+                    "ŞASİ",
 
                 anchor: [
                     0.17,
@@ -1261,7 +2235,8 @@
             },
 
             {
-                title: "ISITMA",
+                title:
+                    "ISITMA",
 
                 anchor: [
                     0.50,
@@ -1281,7 +2256,8 @@
             },
 
             {
-                title: "DÖNÜŞ",
+                title:
+                    "DÖNÜŞ",
 
                 anchor: [
                     0.48,
@@ -1301,7 +2277,8 @@
             },
 
             {
-                title: "KONTROL",
+                title:
+                    "KONTROL",
 
                 anchor: [
                     0.82,
@@ -1321,7 +2298,8 @@
             },
 
             {
-                title: "MÜHENDİSLİK",
+                title:
+                    "MÜHENDİSLİK",
 
                 anchor: [
                     0.48,
@@ -1342,9 +2320,9 @@
         ]
     };
 
-    // =====================
-    // Spotlight 3D
-    // =====================
+    // =====================================================
+    // Spotlight Scene
+    // =====================================================
 
     function initSpotlightScene() {
         const canvas =
@@ -1382,35 +2360,45 @@
             return;
         }
 
-        if (!hasThree()) {
+        if (
+            !hasThree()
+        ) {
             setStatus(
                 "spotlight-model-status",
+
                 "3D engine failed to load.",
+
                 "error"
             );
 
             return;
         }
 
-        const isMobile = () => {
-            return window.innerWidth < 700;
-        };
+        const isMobile =
+            () =>
+                window.innerWidth <
+                700;
 
-        const isTablet = () => {
-            return (
-                window.innerWidth >= 700 &&
-                window.innerWidth < 1180
-            );
-        };
+        const isTablet =
+            () =>
+                window.innerWidth >=
+                700 &&
+
+                window.innerWidth <
+                1180;
 
         function getModelSize() {
-            if (isMobile()) {
+            if (
+                isMobile()
+            ) {
                 return SPOTLIGHT_CONFIG
                     .model
                     .mobileSize;
             }
 
-            if (isTablet()) {
+            if (
+                isTablet()
+            ) {
                 return SPOTLIGHT_CONFIG
                     .model
                     .tabletSize;
@@ -1422,13 +2410,17 @@
         }
 
         function getCameraZ() {
-            if (isMobile()) {
+            if (
+                isMobile()
+            ) {
                 return SPOTLIGHT_CONFIG
                     .model
                     .cameraMobileZ;
             }
 
-            if (isTablet()) {
+            if (
+                isTablet()
+            ) {
                 return SPOTLIGHT_CONFIG
                     .model
                     .cameraTabletZ;
@@ -1441,15 +2433,20 @@
 
         function getViewportSize() {
             return {
-                width: Math.max(
-                    1,
-                    visual.clientWidth
-                ),
+                width:
+                    Math.max(
+                        1,
 
-                height: Math.max(
-                    420,
-                    visual.clientHeight || 640
-                )
+                        visual.clientWidth
+                    ),
+
+                height:
+                    Math.max(
+                        420,
+
+                        visual.clientHeight ||
+                        640
+                    )
             };
         }
 
@@ -1459,8 +2456,13 @@
         const renderer =
             new THREE.WebGLRenderer({
                 canvas,
-                antialias: !isMobile(),
-                alpha: true,
+
+                antialias:
+                    !isMobile(),
+
+                alpha:
+                    true,
+
                 powerPreference:
                     "high-performance"
             });
@@ -1479,54 +2481,54 @@
         renderer.setPixelRatio(
             Math.min(
                 window.devicePixelRatio,
-                isMobile() ? 1.15 : 1.65
+
+                isMobile()
+                    ? 1.15
+                    : 1.65
             )
         );
-
-        renderer.outputEncoding =
-            THREE.sRGBEncoding;
-
-        renderer.toneMapping =
-            THREE.ACESFilmicToneMapping;
-
-        renderer.toneMappingExposure =
-            1.05;
 
         configureRobotRenderer(
             renderer,
             isMobile()
         );
 
+        renderer.toneMappingExposure =
+            1.05;
 
         const scene =
             new THREE.Scene();
-        const spotlightEnvironment =
-            createRobotStudioEnvironment(
-                renderer,
-                scene
-            );
+
+        createRobotStudioEnvironment(
+            renderer,
+            scene
+        );
 
         const spotlightLighting =
             createRobotStudioLighting(
                 scene,
+
                 {
-                    mobile: isMobile(),
+                    mobile:
+                        isMobile(),
 
-                    /*
-                     * لأن حجم الروبوت هنا مختلف عن Hero.
-                     */
-                    floorY: -1.53,
+                    floorY:
+                        -1.53,
 
-                    targetY: 0.05
+                    targetY:
+                        0.05
                 }
             );
 
         const camera =
             new THREE.PerspectiveCamera(
                 31,
+
                 initialSize.width /
                 initialSize.height,
+
                 0.1,
+
                 100
             );
 
@@ -1542,11 +2544,6 @@
             0
         );
 
-      
-        // =====================
-        // Robot group
-        // =====================
-
         const modelRig =
             new THREE.Group();
 
@@ -1561,29 +2558,42 @@
                 )
             );
 
-        const hotspotItems = [];
+        const hotspotItems =
+            [];
 
         const defaultHotspotSettings =
             JSON.parse(
                 JSON.stringify(
-                    SPOTLIGHT_CONFIG.hotspots
+                    SPOTLIGHT_CONFIG
+                        .hotspots
                 )
             );
 
-        let model = null;
-        let wireframeModel = null;
-        let modelReady = false;
+        let model =
+            null;
 
-        let visualHovered = false;
+        let wireframeModel =
+            null;
 
-        let pointerTarget = 0;
-        let pointerRotation = 0;
+        let modelReady =
+            false;
 
-        let activeHotspotIndex = 0;
+        let visualHovered =
+            false;
+
+        let pointerTarget =
+            0;
+
+        let pointerRotation =
+            0;
+
+        let activeHotspotIndex =
+            0;
 
         let editMode =
             Boolean(
-                SPOTLIGHT_CONFIG.editMode
+                SPOTLIGHT_CONFIG
+                    .editMode
             );
 
         function clamp(
@@ -1593,16 +2603,13 @@
         ) {
             return Math.max(
                 minimum,
+
                 Math.min(
                     maximum,
                     value
                 )
             );
         }
-
-        // =====================
-        // Edit mode
-        // =====================
 
         function applyEditMode() {
             visual.classList.toggle(
@@ -1616,8 +2623,12 @@
                     : "false";
 
             hotspotItems.forEach(
-                (item) => {
-                    if (editMode) {
+                (
+                    item
+                ) => {
+                    if (
+                        editMode
+                    ) {
                         item.node.setAttribute(
                             "aria-grabbed",
                             "false"
@@ -1640,10 +2651,6 @@
             );
         }
 
-        // =====================
-        // Local storage
-        // =====================
-
         function loadSavedHotspotSettings() {
             try {
                 const saved =
@@ -1651,18 +2658,28 @@
                         localStorage.getItem(
                             SPOTLIGHT_CONFIG
                                 .storageKey
-                        ) || "null"
+                        ) ||
+                        "null"
                     );
 
-                if (!Array.isArray(saved)) {
+                if (
+                    !Array.isArray(
+                        saved
+                    )
+                ) {
                     return;
                 }
 
                 saved.forEach(
-                    (savedItem, index) => {
+                    (
+                        savedItem,
+                        index
+                    ) => {
                         const target =
                             SPOTLIGHT_CONFIG
-                                .hotspots[index];
+                                .hotspots[
+                            index
+                            ];
 
                         if (
                             !target ||
@@ -1673,34 +2690,49 @@
 
                         if (
                             Array.isArray(
-                                savedItem.nodeOffset
+                                savedItem
+                                    .nodeOffset
                             ) &&
-                            savedItem.nodeOffset
-                                .length === 2
+
+                            savedItem
+                                .nodeOffset
+                                .length ===
+                            2
                         ) {
                             target.nodeOffset =
                                 savedItem
                                     .nodeOffset
-                                    .map(Number);
+                                    .map(
+                                        Number
+                                    );
                         }
 
                         if (
                             Array.isArray(
-                                savedItem.labelOffset
+                                savedItem
+                                    .labelOffset
                             ) &&
-                            savedItem.labelOffset
-                                .length === 2
+
+                            savedItem
+                                .labelOffset
+                                .length ===
+                            2
                         ) {
                             target.labelOffset =
                                 savedItem
                                     .labelOffset
-                                    .map(Number);
+                                    .map(
+                                        Number
+                                    );
                         }
                     }
                 );
-            } catch (error) {
+            } catch (
+            error
+            ) {
                 console.warn(
                     "Could not load saved spotlight positions.",
+
                     error
                 );
             }
@@ -1712,7 +2744,9 @@
                     SPOTLIGHT_CONFIG
                         .hotspots
                         .map(
-                            (hotspot) => ({
+                            (
+                                hotspot
+                            ) => ({
                                 title:
                                     hotspot.title,
 
@@ -1727,44 +2761,59 @@
                         );
 
                 localStorage.setItem(
-                    SPOTLIGHT_CONFIG.storageKey,
-                    JSON.stringify(payload)
+                    SPOTLIGHT_CONFIG
+                        .storageKey,
+
+                    JSON.stringify(
+                        payload
+                    )
                 );
-            } catch (error) {
+            } catch (
+            error
+            ) {
                 console.warn(
                     "Could not save spotlight positions.",
+
                     error
                 );
             }
         }
 
-        // =====================
-        // Active hotspot
-        // =====================
-
-        function setActiveHotspot(index) {
+        function setActiveHotspot(
+            index
+        ) {
             activeHotspotIndex =
                 index;
 
             hotspotItems.forEach(
-                (item, itemIndex) => {
+                (
+                    item,
+                    itemIndex
+                ) => {
                     const active =
-                        itemIndex === index;
+                        itemIndex ===
+                        index;
 
-                    item.node.classList.toggle(
-                        "is-active",
-                        active
-                    );
+                    item.node
+                        .classList
+                        .toggle(
+                            "is-active",
+                            active
+                        );
 
-                    item.label.classList.toggle(
-                        "is-active",
-                        active
-                    );
+                    item.label
+                        .classList
+                        .toggle(
+                            "is-active",
+                            active
+                        );
 
-                    item.line.classList.toggle(
-                        "is-active",
-                        active
-                    );
+                    item.line
+                        .classList
+                        .toggle(
+                            "is-active",
+                            active
+                        );
                 }
             );
 
@@ -1774,15 +2823,19 @@
                     calloutIndex
                 ) => {
                     const active =
-                        calloutIndex === index;
+                        calloutIndex ===
+                        index;
 
-                    callout.classList.toggle(
-                        "is-active",
-                        active
-                    );
+                    callout
+                        .classList
+                        .toggle(
+                            "is-active",
+                            active
+                        );
 
                     callout.setAttribute(
                         "aria-current",
+
                         active
                             ? "true"
                             : "false"
@@ -1791,64 +2844,41 @@
             );
         }
 
-        function printHotspotSettings(
-            index
-        ) {
-            const hotspot =
-                SPOTLIGHT_CONFIG
-                    .hotspots[index];
-
-            console.log(
-                `Hotspot ${index + 1} — ${hotspot.title}`
-            );
-
-            console.log(
-                JSON.stringify(
-                    {
-                        title:
-                            hotspot.title,
-
-                        anchor:
-                            hotspot.anchor,
-
-                        nodeOffset:
-                            hotspot.nodeOffset,
-
-                        labelOffset:
-                            hotspot.labelOffset
-                    },
-                    null,
-                    2
-                )
-            );
-        }
-
-        // =====================
-        // Dragging
-        // =====================
-
         function enableDragging(
             element,
             offsetArray,
             hotspotIndex,
             type
         ) {
-            let dragging = false;
+            let dragging =
+                false;
 
-            let startMouseX = 0;
-            let startMouseY = 0;
+            let startMouseX =
+                0;
 
-            let startOffsetX = 0;
-            let startOffsetY = 0;
+            let startMouseY =
+                0;
+
+            let startOffsetX =
+                0;
+
+            let startOffsetY =
+                0;
 
             element.addEventListener(
                 "pointerdown",
-                (event) => {
-                    if (!editMode) {
+
+                (
+                    event
+                ) => {
+                    if (
+                        !editMode
+                    ) {
                         return;
                     }
 
-                    dragging = true;
+                    dragging =
+                        true;
 
                     startMouseX =
                         event.clientX;
@@ -1866,24 +2896,25 @@
                         "is-dragging"
                     );
 
-                    element.setAttribute(
-                        "aria-grabbed",
-                        "true"
-                    );
-
                     element.setPointerCapture(
                         event.pointerId
                     );
 
                     event.preventDefault();
+
                     event.stopPropagation();
                 }
             );
 
             element.addEventListener(
                 "pointermove",
-                (event) => {
-                    if (!dragging) {
+
+                (
+                    event
+                ) => {
+                    if (
+                        !dragging
+                    ) {
                         return;
                     }
 
@@ -1902,24 +2933,25 @@
                         );
 
                     event.preventDefault();
+
                     event.stopPropagation();
                 }
             );
 
-            function finishDrag(event) {
-                if (!dragging) {
+            function finishDrag(
+                event
+            ) {
+                if (
+                    !dragging
+                ) {
                     return;
                 }
 
-                dragging = false;
+                dragging =
+                    false;
 
                 element.classList.remove(
                     "is-dragging"
-                );
-
-                element.setAttribute(
-                    "aria-grabbed",
-                    "false"
                 );
 
                 if (
@@ -1935,10 +2967,7 @@
                 saveHotspotSettings();
 
                 console.log(
-                    `${type} position updated and saved`
-                );
-
-                printHotspotSettings(
+                    `${type} position updated and saved`,
                     hotspotIndex
                 );
             }
@@ -1954,17 +2983,16 @@
             );
         }
 
-        // =====================
-        // Create HTML hotspots
-        // =====================
-
         function createHotspotElements() {
             loadSavedHotspotSettings();
 
             SPOTLIGHT_CONFIG
                 .hotspots
                 .forEach(
-                    (hotspot, index) => {
+                    (
+                        hotspot,
+                        index
+                    ) => {
                         const line =
                             document.createElementNS(
                                 "http://www.w3.org/2000/svg",
@@ -1995,7 +3023,8 @@
 
                         node.textContent =
                             String(
-                                index + 1
+                                index +
+                                1
                             ).padStart(
                                 2,
                                 "0"
@@ -2026,31 +3055,23 @@
                         label.textContent =
                             hotspot.title;
 
-                        label.setAttribute(
-                            "aria-label",
-                            `${hotspot.title} etiketi`
-                        );
-
                         label.style.opacity =
                             "0";
 
                         label.style.visibility =
                             "hidden";
 
-                        /*
-                         * هذا السطر مهم.
-                         * يضيف النصوص والدوائر إلى الشاشة.
-                         */
                         hotspotLayer.append(
                             node,
                             label
                         );
 
-                        const activate = () => {
-                            setActiveHotspot(
-                                index
-                            );
-                        };
+                        const activate =
+                            () => {
+                                setActiveHotspot(
+                                    index
+                                );
+                            };
 
                         node.addEventListener(
                             "mouseenter",
@@ -2097,9 +3118,13 @@
                         );
 
                         const callout =
-                            callouts[index];
+                            callouts[
+                            index
+                            ];
 
-                        if (callout) {
+                        if (
+                            callout
+                        ) {
                             callout.tabIndex =
                                 0;
 
@@ -2123,7 +3148,8 @@
                             line,
                             node,
                             label,
-                            anchor: null,
+                            anchor:
+                                null,
                             hotspot
                         });
                     }
@@ -2131,10 +3157,6 @@
 
             applyEditMode();
         }
-
-        // =====================
-        // 3D anchors
-        // =====================
 
         function createAnchorFromBounds(
             targetModel,
@@ -2145,7 +3167,8 @@
                 normalizedX,
                 normalizedY,
                 normalizedZ
-            ] = normalizedPosition;
+            ] =
+                normalizedPosition;
 
             const worldPoint =
                 new THREE.Vector3(
@@ -2187,24 +3210,18 @@
             return anchor;
         }
 
-        // =====================
-        // Temporary wireframe cleanup
-        // =====================
-
         function disposeWireframe(
             root
         ) {
             root.traverse(
-                (child) => {
-                    if (!child.isMesh) {
+                (
+                    child
+                ) => {
+                    if (
+                        !child.isMesh
+                    ) {
                         return;
                     }
-
-                    /*
-                     * لا نحذف geometry لأن المجسم
-                     * الأصلي والـwireframe يستخدمان
-                     * نفس Geometry.
-                     */
 
                     if (
                         Array.isArray(
@@ -2212,7 +3229,9 @@
                         )
                     ) {
                         child.material.forEach(
-                            (material) => {
+                            (
+                                material
+                            ) => {
                                 material?.dispose?.();
                             }
                         );
@@ -2223,18 +3242,13 @@
             );
         }
 
-        // =====================
-        // Model layout
-        // =====================
-
         function rebuildModelLayout() {
-            if (!model) {
+            if (
+                !model
+            ) {
                 return;
             }
 
-            /*
-             * إعادة المجموعة إلى الصفر قبل الحساب.
-             */
             modelRig.position.set(
                 0,
                 0,
@@ -2269,18 +3283,14 @@
                 0
             );
 
-            /*
-             * تصغير الروبوت وتوسيطه.
-             */
             fitModelToView(
                 model,
                 getModelSize()
             );
 
-            /*
-             * حذف wireframe السابق فقط.
-             */
-            if (wireframeModel) {
+            if (
+                wireframeModel
+            ) {
                 modelRig.remove(
                     wireframeModel
                 );
@@ -2297,27 +3307,39 @@
                 true
             );
 
-            /*
-             * Wireframe جديد وخفيف.
-             */
             wireframeModel =
-                model.clone(true);
+                model.clone(
+                    true
+                );
 
             wireframeModel.traverse(
-                (child) => {
-                    if (!child.isMesh) {
+                (
+                    child
+                ) => {
+                    if (
+                        !child.isMesh
+                    ) {
                         return;
                     }
 
                     child.material =
                         new THREE.MeshBasicMaterial({
                             color:
-                                CONFIG.colors.ember,
+                                CONFIG
+                                    .colors
+                                    .ember,
 
-                            wireframe: true,
-                            transparent: true,
-                            opacity: 0.035,
-                            depthWrite: false
+                            wireframe:
+                                true,
+
+                            transparent:
+                                true,
+
+                            opacity:
+                                0.035,
+
+                            depthWrite:
+                                false
                         });
                 }
             );
@@ -2330,14 +3352,14 @@
                 wireframeModel
             );
 
-            /*
-             * حذف النقاط القديمة.
-             */
             hotspotItems.forEach(
-                (item) => {
-                    if (item.anchor) {
+                (
+                    item
+                ) => {
+                    if (
                         item.anchor
-                            .removeFromParent();
+                    ) {
+                        item.anchor.removeFromParent();
 
                         item.anchor =
                             null;
@@ -2355,11 +3377,10 @@
                         model
                     );
 
-            /*
-             * إنشاء النقاط الجديدة.
-             */
             hotspotItems.forEach(
-                (item) => {
+                (
+                    item
+                ) => {
                     item.anchor =
                         createAnchorFromBounds(
                             model,
@@ -2369,9 +3390,6 @@
                 }
             );
 
-            /*
-             * مكان وزاوية الروبوت النهائيان.
-             */
             modelRig.position.set(
                 SPOTLIGHT_CONFIG
                     .model
@@ -2399,10 +3417,6 @@
             );
         }
 
-        // =====================
-        // Project 3D to screen
-        // =====================
-
         function updateHotspots() {
             if (
                 !modelReady ||
@@ -2418,8 +3432,12 @@
                 visual.clientHeight;
 
             hotspotItems.forEach(
-                (item) => {
-                    if (!item.anchor) {
+                (
+                    item
+                ) => {
+                    if (
+                        !item.anchor
+                    ) {
                         return;
                     }
 
@@ -2450,61 +3468,86 @@
                         ) *
                         height;
 
-                    /*
-                     * مكان الدائرة.
-                     */
                     const nodeX =
                         clamp(
                             projectedX +
-                            item.hotspot
-                                .nodeOffset[0],
+                            item
+                                .hotspot
+                                .nodeOffset[
+                            0
+                            ],
 
                             24,
-                            width - 24
+
+                            width -
+                            24
                         );
 
                     const nodeY =
                         clamp(
                             projectedY +
-                            item.hotspot
-                                .nodeOffset[1],
+                            item
+                                .hotspot
+                                .nodeOffset[
+                            1
+                            ],
 
                             24,
-                            height - 24
+
+                            height -
+                            24
                         );
 
-                    /*
-                     * مكان النص.
-                     */
                     const labelX =
                         clamp(
                             nodeX +
-                            item.hotspot
-                                .labelOffset[0],
+                            item
+                                .hotspot
+                                .labelOffset[
+                            0
+                            ],
 
                             18,
-                            width - 150
+
+                            width -
+                            150
                         );
 
                     const labelY =
                         clamp(
                             nodeY +
-                            item.hotspot
-                                .labelOffset[1],
+                            item
+                                .hotspot
+                                .labelOffset[
+                            1
+                            ],
 
                             30,
-                            height - 30
+
+                            height -
+                            30
                         );
 
                     const visible =
-                        projected.z > -1 &&
-                        projected.z < 1 &&
-                        projectedX > -80 &&
+                        projected.z >
+                        -1 &&
+
+                        projected.z <
+                        1 &&
+
+                        projectedX >
+                        -80 &&
+
                         projectedX <
-                        width + 80 &&
-                        projectedY > -80 &&
+                        width +
+                        80 &&
+
+                        projectedY >
+                        -80 &&
+
                         projectedY <
-                        height + 80;
+                        height +
+                        80;
 
                     item.node.style.left =
                         `${nodeX}px`;
@@ -2540,22 +3583,30 @@
 
                     item.line.setAttribute(
                         "x1",
-                        String(nodeX)
+                        String(
+                            nodeX
+                        )
                     );
 
                     item.line.setAttribute(
                         "y1",
-                        String(nodeY)
+                        String(
+                            nodeY
+                        )
                     );
 
                     item.line.setAttribute(
                         "x2",
-                        String(labelX)
+                        String(
+                            labelX
+                        )
                     );
 
                     item.line.setAttribute(
                         "y2",
-                        String(labelY)
+                        String(
+                            labelY
+                        )
                     );
 
                     item.line.style.opacity =
@@ -2566,19 +3617,13 @@
             );
         }
 
-        // =====================
-        // Create points
-        // =====================
-
         createHotspotElements();
-
-        // =====================
-        // Load GLB
-        // =====================
 
         loadRobotModel()
             .then(
-                (gltf) => {
+                (
+                    gltf
+                ) => {
                     model =
                         cloneRobotScene(
                             gltf
@@ -2608,27 +3653,30 @@
                     );
                 }
             )
+
             .catch(
-                (error) => {
+                (
+                    error
+                ) => {
                     console.error(
-                        "Failed loading spotlight rob.glb",
+                        "Failed loading spotlight robot model",
+
                         error
                     );
 
                     setStatus(
                         "spotlight-model-status",
-                        "3D model unavailable.",
+
+                        "3D model could not be loaded.",
+
                         "error"
                     );
                 }
             );
 
-        // =====================
-        // Mouse interaction
-        // =====================
-
         visual.addEventListener(
             "mouseenter",
+
             () => {
                 visualHovered =
                     true;
@@ -2637,6 +3685,7 @@
 
         visual.addEventListener(
             "mouseleave",
+
             () => {
                 visualHovered =
                     false;
@@ -2648,7 +3697,10 @@
 
         visual.addEventListener(
             "pointermove",
-            (event) => {
+
+            (
+                event
+            ) => {
                 if (
                     isMobile() ||
                     prefersReducedMotion ||
@@ -2673,20 +3725,18 @@
                     normalizedX *
                     0.22;
             },
+
             {
                 passive: true
             }
         );
 
-        // =====================
-        // Resize
-        // =====================
-
         function updateSize() {
             const {
                 width,
                 height
-            } = getViewportSize();
+            } =
+                getViewportSize();
 
             renderer.setSize(
                 width,
@@ -2697,6 +3747,7 @@
             renderer.setPixelRatio(
                 Math.min(
                     window.devicePixelRatio,
+
                     isMobile()
                         ? 1.15
                         : 1.65
@@ -2704,12 +3755,9 @@
             );
 
             camera.aspect =
-                width / height;
+                width /
+                height;
 
-            /*
-             * مهم:
-             * لا نعيد الكاميرا إلى 6.6.
-             */
             camera.position.z =
                 getCameraZ();
 
@@ -2721,16 +3769,21 @@
                 0
             );
 
-            if (modelReady) {
+            if (
+                modelReady
+            ) {
                 rebuildModelLayout();
             }
         }
 
         const resizeObserver =
-            "ResizeObserver" in window
+            "ResizeObserver" in
+                window
+
                 ? new ResizeObserver(
                     updateSize
                 )
+
                 : null;
 
         resizeObserver?.observe(
@@ -2745,23 +3798,19 @@
             }
         );
 
-        // =====================
-        // Animation
-        // =====================
-
         const clock =
             new THREE.Clock();
 
         setupVisibilityLoop(
             section,
+
             () => {
                 const elapsedTime =
                     clock.getElapsedTime();
 
-                /*
-                 * أثناء التعديل يبقى الروبوت ثابتًا.
-                 */
-                if (!editMode) {
+                if (
+                    !editMode
+                ) {
                     pointerRotation +=
                         (
                             pointerTarget -
@@ -2773,25 +3822,33 @@
                         SPOTLIGHT_CONFIG
                             .model
                             .automaticMotion &&
+
                             !visualHovered &&
+
                             !prefersReducedMotion
+
                             ? Math.sin(
                                 elapsedTime *
                                 0.34
                             ) *
                             0.035
+
                             : 0;
 
                     modelRig.rotation.y =
                         SPOTLIGHT_CONFIG
                             .model
                             .rotationY +
+
                         pointerRotation +
+
                         automaticRotation;
 
                     modelRig.rotation.x =
                         prefersReducedMotion
+
                             ? 0
+
                             : Math.sin(
                                 elapsedTime *
                                 0.45
@@ -2807,13 +3864,16 @@
                             .rotationY;
                 }
 
-                if (!prefersReducedMotion) {
+                if (
+                    !prefersReducedMotion
+                ) {
                     spotlightLighting
                         .heaterLight
                         .intensity =
                         0.52 +
                         Math.sin(
-                            elapsedTime * 2
+                            elapsedTime *
+                            2
                         ) *
                         0.04;
 
@@ -2822,7 +3882,8 @@
                         .intensity =
                         3.15 +
                         Math.sin(
-                            elapsedTime * 0.8
+                            elapsedTime *
+                            0.8
                         ) *
                         0.1;
                 }
@@ -2836,11 +3897,8 @@
             }
         );
 
-        // =====================
-        // Console controls
-        // =====================
-
-        window.IPRobotXSpotlight = {
+        window.IPRobotXSpotlight =
+        {
             getConfig() {
                 return JSON.parse(
                     JSON.stringify(
@@ -2854,25 +3912,39 @@
                     JSON.stringify(
                         SPOTLIGHT_CONFIG
                             .hotspots,
+
                         null,
+
                         2
                     )
                 );
             },
 
-            setEditMode(value) {
+            setEditMode(
+                value
+            ) {
                 editMode =
-                    Boolean(value);
+                    Boolean(
+                        value
+                    );
 
                 applyEditMode();
             },
 
-            setActive(index) {
+            setActive(
+                index
+            ) {
                 const safeIndex =
                     clamp(
-                        Number(index) || 0,
+                        Number(
+                            index
+                        ) ||
                         0,
-                        hotspotItems.length - 1
+
+                        0,
+
+                        hotspotItems.length -
+                        1
                     );
 
                 setActiveHotspot(
@@ -2898,17 +3970,21 @@
                             hotspot,
                             index
                         ) => {
-                            hotspot.nodeOffset = [
-                                ...defaultHotspotSettings[
-                                    index
-                                ].nodeOffset
-                            ];
+                            hotspot.nodeOffset =
+                                [
+                                    ...defaultHotspotSettings[
+                                        index
+                                    ]
+                                        .nodeOffset
+                                ];
 
-                            hotspot.labelOffset = [
-                                ...defaultHotspotSettings[
-                                    index
-                                ].labelOffset
-                            ];
+                            hotspot.labelOffset =
+                                [
+                                    ...defaultHotspotSettings[
+                                        index
+                                    ]
+                                        .labelOffset
+                                ];
                         }
                     );
 
@@ -2916,48 +3992,50 @@
                     SPOTLIGHT_CONFIG
                         .storageKey
                 );
-
-                console.log(
-                    "Spotlight positions reset."
-                );
             }
         };
     }
 
     // =====================================================
-    // Interactive triangular line field for spec cards
+    // Interactive triangular field
     // =====================================================
 
     function initSpecTriangleField() {
-        const cards = Array.from(
-            document.querySelectorAll(".spec-card")
-        );
+        const cards =
+            Array.from(
+                document.querySelectorAll(
+                    ".spec-card"
+                )
+            );
 
-        if (!cards.length) {
+        if (
+            !cards.length
+        ) {
             return;
         }
 
-        const states = [];
+        const states =
+            [];
 
         const TRIANGLE_CONFIG = {
-    spacing: 62,
-    attractionRadius: 175,
-    attractionStrength: 0.72,
-    movementSpeed: 0.14,
+            spacing:
+                62,
 
-    normalLineWidth: 0.65,
-    activeLineWidth: 1.65,
+            attractionRadius:
+                175,
 
-    // شفافية الخطوط
-    normalOpacity: 0.035,
-    activeOpacity: 0.38,
+            attractionStrength:
+                0.72,
 
-    // شفافية الإضاءة حول المؤشر
-    glowOpacity: 0.045,
+            movementSpeed:
+                0.14,
 
-    // شفافية نقاط تقاطع الخطوط
-    pointOpacity: 0.32
-};
+            normalLineWidth:
+                0.65,
+
+            activeLineWidth:
+                1.65
+        };
 
         function clamp(
             value,
@@ -2966,6 +4044,7 @@
         ) {
             return Math.max(
                 minimum,
+
                 Math.min(
                     maximum,
                     value
@@ -2980,13 +4059,21 @@
         ) {
             return (
                 start +
-                (end - start) * amount
+                (
+                    end -
+                    start
+                ) *
+                amount
             );
         }
 
-        function createState(card) {
+        function createState(
+            card
+        ) {
             const canvas =
-                document.createElement("canvas");
+                document.createElement(
+                    "canvas"
+                );
 
             canvas.className =
                 "spec-triangle-canvas";
@@ -2996,17 +4083,20 @@
                 "true"
             );
 
-            /*
-             * يجب وضع Canvas كأول عنصر
-             * حتى يبقى خلف النصوص.
-             */
-            card.prepend(canvas);
+            card.prepend(
+                canvas
+            );
 
             const context =
-                canvas.getContext("2d");
+                canvas.getContext(
+                    "2d"
+                );
 
-            if (!context) {
+            if (
+                !context
+            ) {
                 canvas.remove();
+
                 return null;
             }
 
@@ -3015,23 +4105,42 @@
                 canvas,
                 context,
 
-                width: 0,
-                height: 0,
-                pixelRatio: 1,
+                width:
+                    0,
 
-                nodes: [],
-                nodeMap: new Map(),
-                edges: [],
+                height:
+                    0,
 
-                hovered: false,
-                visible: true,
+                pixelRatio:
+                    1,
+
+                nodes:
+                    [],
+
+                nodeMap:
+                    new Map(),
+
+                edges:
+                    [],
+
+                hovered:
+                    false,
+
+                visible:
+                    true,
 
                 pointer: {
-                    x: 0,
-                    y: 0,
+                    x:
+                        0,
 
-                    targetX: 0,
-                    targetY: 0
+                    y:
+                        0,
+
+                    targetX:
+                        0,
+
+                    targetY:
+                        0
                 }
             };
 
@@ -3043,80 +4152,97 @@
             }
 
             function createTriangleGrid() {
-                state.nodes = [];
-                state.edges = [];
+                state.nodes =
+                    [];
+
+                state.edges =
+                    [];
+
                 state.nodeMap.clear();
 
                 const spacing =
-                    TRIANGLE_CONFIG.spacing;
+                    TRIANGLE_CONFIG
+                        .spacing;
 
                 const rowHeight =
                     spacing *
-                    Math.sqrt(3) /
+                    Math.sqrt(
+                        3
+                    ) /
                     2;
 
                 const columnCount =
                     Math.ceil(
                         state.width /
                         spacing
-                    ) + 5;
+                    ) +
+                    5;
 
                 const rowCount =
                     Math.ceil(
                         state.height /
                         rowHeight
-                    ) + 5;
-
-                /*
-                 * نبدأ خارج حدود البطاقة قليلًا
-                 * حتى لا تظهر فراغات عند الأطراف.
-                 */
+                    ) +
+                    5;
 
                 for (
                     let row = -2;
-                    row <= rowCount;
+                    row <=
+                    rowCount;
                     row += 1
                 ) {
                     const oddRow =
-                        Boolean(row & 1);
+                        Boolean(
+                            row &
+                            1
+                        );
 
                     for (
                         let column = -2;
-                        column <= columnCount;
+                        column <=
+                        columnCount;
                         column += 1
                     ) {
                         const baseX =
-                            column * spacing +
+                            column *
+                            spacing +
+
                             (
                                 oddRow
-                                    ? spacing / 2
+                                    ? spacing /
+                                    2
                                     : 0
                             );
 
                         const baseY =
-                            row * rowHeight;
+                            row *
+                            rowHeight;
 
                         const node = {
                             row,
                             column,
-
                             baseX,
                             baseY,
-
-                            x: baseX,
-                            y: baseY,
-
-                            targetX: baseX,
-                            targetY: baseY
+                            x:
+                                baseX,
+                            y:
+                                baseY,
+                            targetX:
+                                baseX,
+                            targetY:
+                                baseY
                         };
 
-                        state.nodes.push(node);
+                        state.nodes.push(
+                            node
+                        );
 
                         state.nodeMap.set(
                             getNodeKey(
                                 row,
                                 column
                             ),
+
                             node
                         );
                     }
@@ -3140,67 +4266,93 @@
                 }
 
                 state.nodes.forEach(
-                    (node) => {
+                    (
+                        node
+                    ) => {
                         const {
                             row,
                             column
-                        } = node;
+                        } =
+                            node;
 
-                        /*
-                         * الخط الأفقي.
-                         */
                         addEdge(
                             node,
-                            state.nodeMap.get(
-                                getNodeKey(
-                                    row,
-                                    column + 1
-                                )
-                            )
-                        );
 
-                        /*
-                         * الخطوط القطرية لتشكيل المثلثات.
-                         */
-                        if (row & 1) {
-                            addEdge(
-                                node,
-                                state.nodeMap.get(
+                            state
+                                .nodeMap
+                                .get(
                                     getNodeKey(
-                                        row + 1,
-                                        column
+                                        row,
+                                        column +
+                                        1
                                     )
                                 )
+                        );
+
+                        if (
+                            row &
+                            1
+                        ) {
+                            addEdge(
+                                node,
+
+                                state
+                                    .nodeMap
+                                    .get(
+                                        getNodeKey(
+                                            row +
+                                            1,
+
+                                            column
+                                        )
+                                    )
                             );
 
                             addEdge(
                                 node,
-                                state.nodeMap.get(
-                                    getNodeKey(
-                                        row + 1,
-                                        column + 1
+
+                                state
+                                    .nodeMap
+                                    .get(
+                                        getNodeKey(
+                                            row +
+                                            1,
+
+                                            column +
+                                            1
+                                        )
                                     )
-                                )
                             );
                         } else {
                             addEdge(
                                 node,
-                                state.nodeMap.get(
-                                    getNodeKey(
-                                        row + 1,
-                                        column
+
+                                state
+                                    .nodeMap
+                                    .get(
+                                        getNodeKey(
+                                            row +
+                                            1,
+
+                                            column
+                                        )
                                     )
-                                )
                             );
 
                             addEdge(
                                 node,
-                                state.nodeMap.get(
-                                    getNodeKey(
-                                        row + 1,
-                                        column - 1
+
+                                state
+                                    .nodeMap
+                                    .get(
+                                        getNodeKey(
+                                            row +
+                                            1,
+
+                                            column -
+                                            1
+                                        )
                                     )
-                                )
                             );
                         }
                     }
@@ -3214,18 +4366,22 @@
                 state.width =
                     Math.max(
                         1,
+
                         rectangle.width
                     );
 
                 state.height =
                     Math.max(
                         1,
+
                         rectangle.height
                     );
 
                 state.pixelRatio =
                     Math.min(
-                        window.devicePixelRatio || 1,
+                        window.devicePixelRatio ||
+                        1,
+
                         2
                     );
 
@@ -3257,16 +4413,20 @@
                 );
 
                 state.pointer.x =
-                    state.width / 2;
+                    state.width /
+                    2;
 
                 state.pointer.y =
-                    state.height / 2;
+                    state.height /
+                    2;
 
                 state.pointer.targetX =
-                    state.width / 2;
+                    state.width /
+                    2;
 
                 state.pointer.targetY =
-                    state.height / 2;
+                    state.height /
+                    2;
 
                 createTriangleGrid();
             }
@@ -3289,31 +4449,41 @@
                     (
                         state.pointer.targetX /
                         rectangle.width
-                    ) * 100;
+                    ) *
+                    100;
 
                 const percentageY =
                     (
                         state.pointer.targetY /
                         rectangle.height
-                    ) * 100;
+                    ) *
+                    100;
 
                 card.style.setProperty(
                     "--pointer-x",
+
                     `${percentageX}%`
                 );
 
                 card.style.setProperty(
                     "--pointer-y",
+
                     `${percentageY}%`
                 );
             }
 
             card.addEventListener(
                 "pointerenter",
-                (event) => {
-                    state.hovered = true;
 
-                    updatePointer(event);
+                (
+                    event
+                ) => {
+                    state.hovered =
+                        true;
+
+                    updatePointer(
+                        event
+                    );
                 }
             );
 
@@ -3327,40 +4497,49 @@
 
             card.addEventListener(
                 "pointerleave",
+
                 () => {
-                    state.hovered = false;
+                    state.hovered =
+                        false;
                 }
             );
 
             const resizeObserver =
-                "ResizeObserver" in window
+                "ResizeObserver" in
+                    window
+
                     ? new ResizeObserver(
                         resizeCanvas
                     )
+
                     : null;
 
-            resizeObserver?.observe(card);
-
-            /*
-             * إيقاف الرسم عندما تكون البطاقة
-             * خارج الشاشة لتحسين الأداء.
-             */
+            resizeObserver?.observe(
+                card
+            );
 
             if (
-                "IntersectionObserver" in window
+                "IntersectionObserver" in
+                window
             ) {
                 const visibilityObserver =
                     new IntersectionObserver(
-                        ([entry]) => {
+                        (
+                            [entry]
+                        ) => {
                             state.visible =
                                 entry.isIntersecting;
                         },
+
                         {
-                            threshold: 0.01
+                            threshold:
+                                0.01
                         }
                     );
 
-                visibilityObserver.observe(card);
+                visibilityObserver.observe(
+                    card
+                );
             }
 
             resizeCanvas();
@@ -3368,7 +4547,9 @@
             return state;
         }
 
-        function updateNodes(state) {
+        function updateNodes(
+            state
+        ) {
             const radius =
                 TRIANGLE_CONFIG
                     .attractionRadius;
@@ -3379,7 +4560,9 @@
 
             const movementSpeed =
                 prefersReducedMotion
+
                     ? 1
+
                     : TRIANGLE_CONFIG
                         .movementSpeed;
 
@@ -3387,23 +4570,29 @@
                 (
                     state.pointer.targetX -
                     state.pointer.x
-                ) * 0.18;
+                ) *
+                0.18;
 
             state.pointer.y +=
                 (
                     state.pointer.targetY -
                     state.pointer.y
-                ) * 0.18;
+                ) *
+                0.18;
 
             state.nodes.forEach(
-                (node) => {
+                (
+                    node
+                ) => {
                     node.targetX =
                         node.baseX;
 
                     node.targetY =
                         node.baseY;
 
-                    if (state.hovered) {
+                    if (
+                        state.hovered
+                    ) {
                         const differenceX =
                             state.pointer.x -
                             node.baseX;
@@ -3416,6 +4605,7 @@
                             Math.sqrt(
                                 differenceX *
                                 differenceX +
+
                                 differenceY *
                                 differenceY
                             );
@@ -3427,12 +4617,10 @@
                                 radius,
 
                                 0,
+
                                 1
                             );
 
-                        /*
-                         * القوة تكون أعلى قرب المؤشر.
-                         */
                         const influence =
                             normalizedDistance *
                             normalizedDistance;
@@ -3441,21 +4629,21 @@
                             influence *
                             strength;
 
-                        /*
-                         * جذب نقاط الشبكة نحو المؤشر.
-                         * بذلك تتجمع الخطوط عند المؤشر.
-                         */
                         node.targetX =
                             lerp(
                                 node.baseX,
+
                                 state.pointer.x,
+
                                 pull
                             );
 
                         node.targetY =
                             lerp(
                                 node.baseY,
+
                                 state.pointer.y,
+
                                 pull
                             );
                     }
@@ -3477,29 +4665,30 @@
             );
         }
 
-        function drawGlow(state) {
-            if (!state.hovered) {
+        function drawGlow(
+            state
+        ) {
+            if (
+                !state.hovered
+            ) {
                 return;
             }
-
-            const {
-                context
-            } = state;
 
             const radius =
                 TRIANGLE_CONFIG
                     .attractionRadius;
 
             const gradient =
-                context.createRadialGradient(
-                    state.pointer.x,
-                    state.pointer.y,
-                    0,
+                state.context
+                    .createRadialGradient(
+                        state.pointer.x,
+                        state.pointer.y,
+                        0,
 
-                    state.pointer.x,
-                    state.pointer.y,
-                    radius
-                );
+                        state.pointer.x,
+                        state.pointer.y,
+                        radius
+                    );
 
             gradient.addColorStop(
                 0,
@@ -3516,10 +4705,10 @@
                 "rgba(255, 74, 10, 0)"
             );
 
-            context.fillStyle =
+            state.context.fillStyle =
                 gradient;
 
-            context.fillRect(
+            state.context.fillRect(
                 0,
                 0,
                 state.width,
@@ -3527,28 +4716,33 @@
             );
         }
 
-        function drawEdges(state) {
-            const {
-                context
-            } = state;
-
+        function drawEdges(
+            state
+        ) {
             const radius =
                 TRIANGLE_CONFIG
                     .attractionRadius;
 
             state.edges.forEach(
-                ([firstNode, secondNode]) => {
+                (
+                    [
+                        firstNode,
+                        secondNode
+                    ]
+                ) => {
                     const middleX =
                         (
                             firstNode.x +
                             secondNode.x
-                        ) / 2;
+                        ) /
+                        2;
 
                     const middleY =
                         (
                             firstNode.y +
                             secondNode.y
-                        ) / 2;
+                        ) /
+                        2;
 
                     const differenceX =
                         state.pointer.x -
@@ -3562,25 +4756,25 @@
                         Math.sqrt(
                             differenceX *
                             differenceX +
+
                             differenceY *
                             differenceY
                         );
 
                     const activeInfluence =
                         state.hovered
+
                             ? clamp(
                                 1 -
                                 distance /
                                 radius,
+
                                 0,
+
                                 1
                             )
-                            : 0;
 
-                    /*
-                     * انتقال لون الخط من الرمادي
-                     * إلى البرتقالي قرب المؤشر.
-                     */
+                            : 0;
 
                     const red =
                         Math.round(
@@ -3614,19 +4808,19 @@
                         activeInfluence *
                         0.52;
 
-                    context.beginPath();
+                    state.context.beginPath();
 
-                    context.moveTo(
+                    state.context.moveTo(
                         firstNode.x,
                         firstNode.y
                     );
 
-                    context.lineTo(
+                    state.context.lineTo(
                         secondNode.x,
                         secondNode.y
                     );
 
-                    context.lineWidth =
+                    state.context.lineWidth =
                         lerp(
                             TRIANGLE_CONFIG
                                 .normalLineWidth,
@@ -3637,29 +4831,31 @@
                             activeInfluence
                         );
 
-                    context.strokeStyle =
+                    state.context.strokeStyle =
                         `rgba(${red}, ${green}, ${blue}, ${opacity})`;
 
-                    context.stroke();
+                    state.context.stroke();
                 }
             );
         }
 
-        function drawPoints(state) {
-            if (!state.hovered) {
+        function drawPoints(
+            state
+        ) {
+            if (
+                !state.hovered
+            ) {
                 return;
             }
-
-            const {
-                context
-            } = state;
 
             const radius =
                 TRIANGLE_CONFIG
                     .attractionRadius;
 
             state.nodes.forEach(
-                (node) => {
+                (
+                    node
+                ) => {
                     const differenceX =
                         state.pointer.x -
                         node.x;
@@ -3672,6 +4868,7 @@
                         Math.sqrt(
                             differenceX *
                             differenceX +
+
                             differenceY *
                             differenceY
                         );
@@ -3681,36 +4878,49 @@
                             1 -
                             distance /
                             radius,
+
                             0,
+
                             1
                         );
 
-                    if (influence <= 0.04) {
+                    if (
+                        influence <=
+                        0.04
+                    ) {
                         return;
                     }
 
-                    context.beginPath();
+                    state.context.beginPath();
 
-                    context.arc(
+                    state.context.arc(
                         node.x,
                         node.y,
+
                         0.8 +
-                        influence * 1.15,
+                        influence *
+                        1.15,
+
                         0,
-                        Math.PI * 2
+
+                        Math.PI *
+                        2
                     );
 
-                    context.fillStyle =
+                    state.context.fillStyle =
                         `rgba(255, 122, 32, ${0.12 +
-                        influence * 0.55
+                        influence *
+                        0.55
                         })`;
 
-                    context.fill();
+                    state.context.fill();
                 }
             );
         }
 
-        function drawState(state) {
+        function drawState(
+            state
+        ) {
             if (
                 !state.visible ||
                 !state.width ||
@@ -3719,36 +4929,53 @@
                 return;
             }
 
-            const {
-                context
-            } = state;
-
-            context.clearRect(
+            state.context.clearRect(
                 0,
                 0,
                 state.width,
                 state.height
             );
 
-            updateNodes(state);
-            drawGlow(state);
-            drawEdges(state);
-            drawPoints(state);
+            updateNodes(
+                state
+            );
+
+            drawGlow(
+                state
+            );
+
+            drawEdges(
+                state
+            );
+
+            drawPoints(
+                state
+            );
         }
 
         cards.forEach(
-            (card) => {
+            (
+                card
+            ) => {
                 const state =
-                    createState(card);
+                    createState(
+                        card
+                    );
 
-                if (state) {
-                    states.push(state);
+                if (
+                    state
+                ) {
+                    states.push(
+                        state
+                    );
                 }
             }
         );
 
         function animate() {
-            states.forEach(drawState);
+            states.forEach(
+                drawState
+            );
 
             requestAnimationFrame(
                 animate
@@ -3758,11 +4985,19 @@
         animate();
     }
 
+    // =====================================================
+    // Init
+    // =====================================================
+
     function init() {
         initCursor();
+
         initReveal();
+
         initHeroScene();
+
         initSpotlightScene();
+
         initSpecTriangleField();
     }
 
