@@ -126,7 +126,11 @@
     // THREE shared helpers
     // =====================
     function hasThree() {
-        return typeof THREE !== "undefined" && typeof THREE.GLTFLoader !== "undefined";
+        return (
+            typeof THREE !== "undefined" &&
+            typeof THREE.GLTFLoader !== "undefined" &&
+            typeof THREE.DRACOLoader !== "undefined"
+        );
     }
 
     function setStatus(id, message, state = "loading") {
@@ -385,16 +389,57 @@
     let robotModelPromise = null;
 
     function loadRobotModel() {
-        if (robotModelPromise) return robotModelPromise;
+        if (robotModelPromise) {
+            return robotModelPromise;
+        }
 
         robotModelPromise = new Promise((resolve, reject) => {
+
+            // Loader الخاص بفك ضغط Draco
+            const dracoLoader = new THREE.DRACOLoader();
+
+            dracoLoader.setDecoderPath(
+                "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/gltf/"
+            );
+
+            // GLTF Loader
             const loader = new THREE.GLTFLoader();
-            loader.load(CONFIG.modelPath, resolve, undefined, reject);
+
+            // ربط Draco مع GLTF Loader
+            loader.setDRACOLoader(dracoLoader);
+
+            loader.load(
+                CONFIG.modelPath,
+
+                (gltf) => {
+                    resolve(gltf);
+                },
+
+                (xhr) => {
+                    if (xhr.total > 0) {
+                        const percent = Math.round(
+                            (xhr.loaded / xhr.total) * 100
+                        );
+
+                        console.log(
+                            `Robot loading: ${percent}%`
+                        );
+                    }
+                },
+
+                (error) => {
+                    console.error(
+                        "Failed to load Draco robot model:",
+                        error
+                    );
+
+                    reject(error);
+                }
+            );
         });
 
         return robotModelPromise;
     }
-
     function cloneRobotScene(gltf) {
         return gltf.scene.clone(true);
     }
