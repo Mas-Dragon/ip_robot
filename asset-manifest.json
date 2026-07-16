@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/ip_robot/static/css/main.f855e6bc.css",
+    "main.js": "/ip_robot/static/js/main.d501080f.js",
+    "static/js/453.6305d4f8.chunk.js": "/ip_robot/static/js/453.6305d4f8.chunk.js",
+    "index.html": "/ip_robot/index.html",
+    "static/media/logo.svg": "/ip_robot/static/media/logo.6ce24c58023cc2f8fd88fe9d219db6c6.svg",
+    "main.f855e6bc.css.map": "/ip_robot/static/css/main.f855e6bc.css.map",
+    "main.d501080f.js.map": "/ip_robot/static/js/main.d501080f.js.map",
+    "453.6305d4f8.chunk.js.map": "/ip_robot/static/js/453.6305d4f8.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.f855e6bc.css",
+    "static/js/main.d501080f.js"
+  ]
+}
