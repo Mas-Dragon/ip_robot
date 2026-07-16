@@ -399,7 +399,7 @@
             const dracoLoader = new THREE.DRACOLoader();
 
             dracoLoader.setDecoderPath(
-                "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/gltf/"
+                "https://www.gstatic.com/draco/v1/decoders/"
             );
 
             // GLTF Loader
