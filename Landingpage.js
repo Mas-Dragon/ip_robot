@@ -1591,9 +1591,7 @@
         ) {
             setStatus(
                 "hero-model-status",
-
                 "3D engine failed to load.",
-
                 "error"
             );
 
@@ -1603,9 +1601,45 @@
         const isMobile =
             () =>
                 window.innerWidth <
-                CONFIG
-                    .breakpoints
-                    .mobile;
+                CONFIG.breakpoints.mobile;
+
+        // =====================================================
+        // REAL CANVAS SIZE
+        // =====================================================
+
+        function getHeroViewportSize() {
+            const rect =
+                canvas.getBoundingClientRect();
+
+            return {
+                width:
+                    Math.max(
+                        1,
+                        Math.round(
+                            rect.width ||
+                            canvas.clientWidth ||
+                            window.innerWidth
+                        )
+                    ),
+
+                height:
+                    Math.max(
+                        1,
+                        Math.round(
+                            rect.height ||
+                            canvas.clientHeight ||
+                            window.innerHeight
+                        )
+                    )
+            };
+        }
+
+        const initialViewport =
+            getHeroViewportSize();
+
+        // =====================================================
+        // RENDERER
+        // =====================================================
 
         const renderer =
             new THREE.WebGLRenderer({
@@ -1622,13 +1656,14 @@
             });
 
         renderer.setSize(
-            window.innerWidth,
-            window.innerHeight
+            initialViewport.width,
+            initialViewport.height,
+            false
         );
 
         renderer.setPixelRatio(
             Math.min(
-                window.devicePixelRatio,
+                window.devicePixelRatio || 1,
 
                 isMobile()
                     ? 1.15
@@ -1641,6 +1676,9 @@
             isMobile()
         );
 
+        // الموبايل بدون Shadows
+        // لتخفيف الضغط على GPU
+
         renderer.shadowMap.enabled =
             !isMobile();
 
@@ -1652,6 +1690,10 @@
 
         renderer.toneMappingExposure =
             0.96;
+
+        // =====================================================
+        // SCENE
+        // =====================================================
 
         const scene =
             new THREE.Scene();
@@ -1673,9 +1715,15 @@
                         -1.65,
 
                     targetY:
-                        0.1
+                        isMobile()
+                            ? -0.1
+                            : 0.1
                 }
             );
+
+        // =====================================================
+        // PARTICLES
+        // =====================================================
 
         const particles =
             prefersReducedMotion
@@ -1690,12 +1738,18 @@
                         : 90
                 );
 
+        // =====================================================
+        // CAMERA
+        // =====================================================
+
         const camera =
             new THREE.PerspectiveCamera(
-                30,
+                isMobile()
+                    ? 32
+                    : 30,
 
-                window.innerWidth /
-                window.innerHeight,
+                initialViewport.width /
+                initialViewport.height,
 
                 0.1,
 
@@ -1708,13 +1762,17 @@
                 : 4.8,
 
             isMobile()
-                ? 0.45
+                ? 0.15
                 : 0.9,
 
             isMobile()
-                ? 10.8
+                ? 8.3
                 : 9.4
         );
+
+        // =====================================================
+        // MODEL GROUP
+        // =====================================================
 
         const modelGroup =
             new THREE.Group();
@@ -1749,10 +1807,15 @@
                 ? 1
                 : 0;
 
+        // =====================================================
+        // MOUSE
+        // =====================================================
+
         const updateMouse =
             (
                 event
             ) => {
+
                 if (
                     isMobile() ||
                     prefersReducedMotion
@@ -1791,6 +1854,10 @@
             }
         );
 
+        // =====================================================
+        // SCROLL
+        // =====================================================
+
         window.addEventListener(
             "scroll",
 
@@ -1804,11 +1871,16 @@
             }
         );
 
+        // =====================================================
+        // LOAD ROBOT
+        // =====================================================
+
         loadRobotModel()
             .then(
                 (
                     gltf
                 ) => {
+
                     model =
                         cloneRobotScene(
                             gltf
@@ -1822,11 +1894,20 @@
                         model
                     );
 
+                    /*
+                     * مهم جدًا:
+                     *
+                     * نعمل fit مرة واحدة فقط.
+                     *
+                     * لا نعيد fitModelToView
+                     * عند resize.
+                     */
+
                     fitModelToView(
                         model,
 
                         isMobile()
-                            ? 2.55
+                            ? 2.7
                             : 3
                     );
 
@@ -1841,7 +1922,9 @@
                             ? 0
                             : 2.6,
 
-                        1.05,
+                        isMobile()
+                            ? -0.1
+                            : 1.05,
 
                         0.15
                     );
@@ -1858,9 +1941,9 @@
                 (
                     error
                 ) => {
+
                     console.error(
                         "Failed to load hero robot model",
-
                         error
                     );
 
@@ -1874,21 +1957,45 @@
                 }
             );
 
+        // =====================================================
+        // CLOCK
+        // =====================================================
+
         const clock =
             new THREE.Clock();
+
+        // =====================================================
+        // RESIZE
+        // =====================================================
 
         function updateHeroLayout() {
             const mobile =
                 isMobile();
 
+            const {
+                width,
+                height
+            } =
+                getHeroViewportSize();
+
+            /*
+             * نستخدم الحجم الحقيقي للـ canvas.
+             *
+             * false تعني:
+             * لا تجعل Three.js يعدل CSS
+             * للـ canvas.
+             */
+
             renderer.setSize(
-                window.innerWidth,
-                window.innerHeight
+                width,
+                height,
+                false
             );
 
             renderer.setPixelRatio(
                 Math.min(
-                    window.devicePixelRatio,
+                    window.devicePixelRatio ||
+                    1,
 
                     mobile
                         ? 1.15
@@ -1899,37 +2006,68 @@
             renderer.shadowMap.enabled =
                 !mobile;
 
-            camera.aspect =
-                window.innerWidth /
-                window.innerHeight;
+            // تحديث Aspect Ratio الصحيح
 
-            camera.updateProjectionMatrix();
+            camera.aspect =
+                width /
+                height;
+
+            // Camera FOV
+
+            camera.fov =
+                mobile
+                    ? 32
+                    : 30;
+
+            // Camera Z
 
             camera.position.z =
                 mobile
-                    ? 10.8
+                    ? 8.3
                     : 9.4;
+
+            // Camera Y
 
             camera.position.y =
                 mobile
-                    ? 0.45
+                    ? 0.15
                     : 0.9;
 
-            if (
-                model
-            ) {
-                fitModelToView(
-                    model,
+            camera.updateProjectionMatrix();
 
-                    mobile
-                        ? 2.25
-                        : 2.55
-                );
-
-                modelBaseScale =
-                    model.scale.x;
-            }
+            /*
+             * لا تضع هنا:
+             *
+             * fitModelToView(...)
+             *
+             * لأنه كان يسبب تغير Scale
+             * واختفاء المجسم على بعض الهواتف.
+             */
         }
+
+        // =====================================================
+        // RESIZE OBSERVER
+        // =====================================================
+
+        const heroResizeObserver =
+            "ResizeObserver" in
+                window
+
+                ? new ResizeObserver(
+                    () => {
+                        updateHeroLayout();
+                    }
+                )
+
+                : null;
+
+        heroResizeObserver?.observe(
+            canvas
+        );
+
+        // =====================================================
+        // WINDOW RESIZE
+        // =====================================================
 
         let resizeFrame =
             null;
@@ -1938,6 +2076,7 @@
             "resize",
 
             () => {
+
                 if (
                     resizeFrame !==
                     null
@@ -1958,25 +2097,43 @@
             }
         );
 
+        // تحديث أولي للحجم
+
+        updateHeroLayout();
+
+        // =====================================================
+        // RENDER LOOP
+        // =====================================================
+
         setupVisibilityLoop(
             section,
 
             () => {
+
                 const t =
                     clock.getElapsedTime();
 
                 const mobile =
                     isMobile();
 
+                // =================================================
+                // MODEL MOVEMENT
+                // =================================================
+
                 if (
                     model
                 ) {
+
+                    // Intro animation
+
                     introProgress +=
                         (
                             1 -
                             introProgress
                         ) *
                         0.035;
+
+                    // Mouse rotation
 
                     currentRotY +=
                         (
@@ -1985,6 +2142,10 @@
                         ) *
                         0.045;
 
+                    // =================================================
+                    // FINAL POSITION
+                    // =================================================
+
                     const finalX =
                         mobile
                             ? 0
@@ -1992,21 +2153,35 @@
 
                     const finalY =
                         mobile
-                            ? -1.0
+                            ? -0.1
                             : -1.38;
+
+                    // =================================================
+                    // INTRO Y
+                    // =================================================
 
                     const introY =
                         THREE.MathUtils.lerp(
+
                             finalY +
-                            0.5,
+                            (
+                                mobile
+                                    ? 0.22
+                                    : 0.5
+                            ),
 
                             finalY,
 
                             introProgress
                         );
 
+                    // =================================================
+                    // INTRO SCALE
+                    // =================================================
+
                     const introScale =
                         THREE.MathUtils.lerp(
+
                             modelBaseScale *
                             0.42,
 
@@ -2015,17 +2190,37 @@
                             introProgress
                         );
 
-                    const scrollInfluence =
-                        Math.min(
-                            scrollY /
-                            1200,
+                    // =================================================
+                    // SCROLL EFFECT
+                    // =================================================
 
-                            1
-                        );
+                    /*
+                     * على الموبايل:
+                     * نوقف تحريك المجسم بالـ Scroll
+                     * حتى يبقى ثابتًا داخل الكاميرا.
+                     */
+
+                    const scrollInfluence =
+                        mobile
+                            ? 0
+                            : Math.min(
+                                scrollY /
+                                1200,
+
+                                1
+                            );
+
+                    // =================================================
+                    // SCALE
+                    // =================================================
 
                     model.scale.setScalar(
                         introScale
                     );
+
+                    // =================================================
+                    // POSITION X
+                    // =================================================
 
                     model.position.x =
                         finalX +
@@ -2035,6 +2230,10 @@
                                 ? 0
                                 : 0.12
                         );
+
+                    // =================================================
+                    // POSITION Y
+                    // =================================================
 
                     model.position.y =
                         introY +
@@ -2047,23 +2246,43 @@
                                     t *
                                     0.9
                                 ) *
-                                0.04
+                                (
+                                    mobile
+                                        ? 0.018
+                                        : 0.04
+                                )
                         );
+
+                    // =================================================
+                    // POSITION Z
+                    // =================================================
 
                     model.position.z =
                         scrollInfluence *
                         0.35;
 
+                    // =================================================
+                    // ROTATION X
+                    // =================================================
+
                     model.rotation.x =
                         -0.04 +
+
                         scrollInfluence *
                         0.08 +
+
                         mouseOffsetY *
                         0.05;
 
+                    // =================================================
+                    // ROTATION Y
+                    // =================================================
+
                     model.rotation.y =
                         -0.45 +
+
                         currentRotY +
+
                         (
                             prefersReducedMotion
 
@@ -2077,34 +2296,47 @@
                         );
                 }
 
+                // =================================================
+                // LIGHT ANIMATION
+                // =================================================
+
                 if (
                     !prefersReducedMotion
                 ) {
+
                     heroLighting
                         .heaterLight
                         .intensity =
+
                         0.55 +
+
                         Math.sin(
                             t *
                             2.1
                         ) *
                         0.045;
 
+
                     heroLighting
                         .rimLight
                         .intensity =
+
                         3.2 +
+
                         Math.cos(
                             t *
                             0.85
                         ) *
                         0.12;
 
+
                     heroLighting
                         .ring
                         .material
                         .opacity =
+
                         0.22 +
+
                         Math.sin(
                             t *
                             1.25
@@ -2112,13 +2344,22 @@
                         0.035;
                 }
 
+                // =================================================
+                // PARTICLES
+                // =================================================
+
                 if (
                     particles
                 ) {
+
                     updateParticles(
                         particles
                     );
                 }
+
+                // =================================================
+                // CAMERA X
+                // =================================================
 
                 camera.position.x =
                     (
@@ -2126,6 +2367,7 @@
                             ? 0
                             : 4.8
                     ) +
+
                     mouseOffsetX *
                     (
                         mobile
@@ -2133,28 +2375,45 @@
                             : 0.08
                     );
 
+                // =================================================
+                // CAMERA Y
+                // =================================================
+
                 camera.position.y =
                     mobile
-                        ? 0.45
+
+                        ? 0.15
+
                         : 0.9 -
+
                         Math.min(
+
                             scrollY *
                             0.00035,
 
                             0.28
                         );
 
+                // =================================================
+                // CAMERA LOOK AT
+                // =================================================
+
                 camera.lookAt(
+
                     mobile
                         ? 0
                         : 1.55,
 
                     mobile
-                        ? -0.55
+                        ? -0.1
                         : 0.18,
 
                     0
                 );
+
+                // =================================================
+                // RENDER
+                // =================================================
 
                 renderer.render(
                     scene,
