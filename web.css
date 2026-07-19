@@ -1909,7 +1909,13 @@ footer {
     }
 
     .hotspot-label {
-        display: none;
+        display: block;
+        min-width: 78px;
+        max-width: 120px;
+        padding: 6px 8px;
+        font-size: 7px;
+        letter-spacing: 1px;
+        white-space: nowrap;
     }
 
     .hotspot-line {
@@ -3282,4 +3288,41 @@ footer {
     .spotlight-visual {
         min-height: 470px;
     }
-}   
+}
+
+/* =========================================
+   FINAL MOBILE SPOTLIGHT FIX
+========================================= */
+
+@media (max-width: 700px) {
+
+    #spotlight .spotlight-visual {
+        width: 100%;
+        min-height: 0 !important;
+        height: 520px !important;
+    }
+
+    #spotlight-canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+
+    .hotspot-label {
+        display: block !important;
+        min-width: 72px;
+        max-width: 105px;
+        padding: 6px 7px;
+        font-size: 7px;
+        letter-spacing: 0.8px;
+    }
+
+    .hotspot-node {
+        width: 28px;
+        height: 28px;
+        font-size: 8px;
+    }
+
+    .hotspot-line {
+        opacity: 0.7 !important;
+    }
+}
