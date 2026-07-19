@@ -2615,9 +2615,7 @@
         ) {
             setStatus(
                 "spotlight-model-status",
-
                 "3D engine failed to load.",
-
                 "error"
             );
 
@@ -2633,17 +2631,18 @@
             () =>
                 window.innerWidth >=
                 700 &&
-
                 window.innerWidth <
                 1180;
+
+        // =====================================================
+        // MODEL SIZE
+        // =====================================================
 
         function getModelSize() {
             if (
                 isMobile()
             ) {
-                return SPOTLIGHT_CONFIG
-                    .model
-                    .mobileSize;
+                return 4.0;
             }
 
             if (
@@ -2659,13 +2658,15 @@
                 .desktopSize;
         }
 
+        // =====================================================
+        // CAMERA Z
+        // =====================================================
+
         function getCameraZ() {
             if (
                 isMobile()
             ) {
-                return SPOTLIGHT_CONFIG
-                    .model
-                    .cameraMobileZ;
+                return 6.2;
             }
 
             if (
@@ -2686,14 +2687,12 @@
                 width:
                     Math.max(
                         1,
-
                         visual.clientWidth
                     ),
 
                 height:
                     Math.max(
                         420,
-
                         visual.clientHeight ||
                         640
                     )
@@ -2702,6 +2701,10 @@
 
         const initialSize =
             getViewportSize();
+
+        // =====================================================
+        // RENDERER
+        // =====================================================
 
         const renderer =
             new THREE.WebGLRenderer({
@@ -2730,7 +2733,7 @@
 
         renderer.setPixelRatio(
             Math.min(
-                window.devicePixelRatio,
+                window.devicePixelRatio || 1,
 
                 isMobile()
                     ? 1.15
@@ -2745,6 +2748,10 @@
 
         renderer.toneMappingExposure =
             1.05;
+
+        // =====================================================
+        // SCENE
+        // =====================================================
 
         const scene =
             new THREE.Scene();
@@ -2770,9 +2777,15 @@
                 }
             );
 
+        // =====================================================
+        // CAMERA
+        // =====================================================
+
         const camera =
             new THREE.PerspectiveCamera(
-                31,
+                isMobile()
+                    ? 34
+                    : 31,
 
                 initialSize.width /
                 initialSize.height,
@@ -2784,15 +2797,27 @@
 
         camera.position.set(
             0,
-            0.12,
+
+            isMobile()
+                ? 0.05
+                : 0.12,
+
             getCameraZ()
         );
 
         camera.lookAt(
             0,
-            0,
+
+            isMobile()
+                ? 0.15
+                : 0,
+
             0
         );
+
+        // =====================================================
+        // MODEL RIG
+        // =====================================================
 
         const modelRig =
             new THREE.Group();
@@ -2943,7 +2968,6 @@
                                 savedItem
                                     .nodeOffset
                             ) &&
-
                             savedItem
                                 .nodeOffset
                                 .length ===
@@ -2962,7 +2986,6 @@
                                 savedItem
                                     .labelOffset
                             ) &&
-
                             savedItem
                                 .labelOffset
                                 .length ===
@@ -2982,7 +3005,6 @@
             ) {
                 console.warn(
                     "Could not load saved spotlight positions.",
-
                     error
                 );
             }
@@ -3023,7 +3045,6 @@
             ) {
                 console.warn(
                     "Could not save spotlight positions.",
-
                     error
                 );
             }
@@ -3492,6 +3513,10 @@
             );
         }
 
+        // =====================================================
+        // REBUILD MODEL
+        // =====================================================
+
         function rebuildModelLayout() {
             if (
                 !model
@@ -3533,6 +3558,7 @@
                 0
             );
 
+            // حجم مختلف للموبايل
             fitModelToView(
                 model,
                 getModelSize()
@@ -3640,16 +3666,24 @@
                 }
             );
 
-            modelRig.position.set(
-                SPOTLIGHT_CONFIG
-                    .model
-                    .position
-                    .x,
+            // =================================================
+            // MODEL POSITION
+            // =================================================
 
-                SPOTLIGHT_CONFIG
-                    .model
-                    .position
-                    .y,
+            modelRig.position.set(
+                isMobile()
+                    ? 0
+                    : SPOTLIGHT_CONFIG
+                        .model
+                        .position
+                        .x,
+
+                isMobile()
+                    ? -0.28
+                    : SPOTLIGHT_CONFIG
+                        .model
+                        .position
+                        .y,
 
                 SPOTLIGHT_CONFIG
                     .model
@@ -3781,20 +3815,15 @@
                     const visible =
                         projected.z >
                         -1 &&
-
                         projected.z <
                         1 &&
-
                         projectedX >
                         -80 &&
-
                         projectedX <
                         width +
                         80 &&
-
                         projectedY >
                         -80 &&
-
                         projectedY <
                         height +
                         80;
@@ -3867,7 +3896,15 @@
             );
         }
 
+        // =====================================================
+        // CREATE HOTSPOTS
+        // =====================================================
+
         createHotspotElements();
+
+        // =====================================================
+        // LOAD MODEL
+        // =====================================================
 
         loadRobotModel()
             .then(
@@ -3910,19 +3947,20 @@
                 ) => {
                     console.error(
                         "Failed loading spotlight robot model",
-
                         error
                     );
 
                     setStatus(
                         "spotlight-model-status",
-
                         "3D model could not be loaded.",
-
                         "error"
                     );
                 }
             );
+
+        // =====================================================
+        // POINTER
+        // =====================================================
 
         visual.addEventListener(
             "mouseenter",
@@ -3981,6 +4019,10 @@
             }
         );
 
+        // =====================================================
+        // RESIZE
+        // =====================================================
+
         function updateSize() {
             const {
                 width,
@@ -3996,7 +4038,7 @@
 
             renderer.setPixelRatio(
                 Math.min(
-                    window.devicePixelRatio,
+                    window.devicePixelRatio || 1,
 
                     isMobile()
                         ? 1.15
@@ -4008,14 +4050,28 @@
                 width /
                 height;
 
+            camera.fov =
+                isMobile()
+                    ? 34
+                    : 31;
+
             camera.position.z =
                 getCameraZ();
+
+            camera.position.y =
+                isMobile()
+                    ? 0.05
+                    : 0.12;
 
             camera.updateProjectionMatrix();
 
             camera.lookAt(
                 0,
-                0,
+
+                isMobile()
+                    ? 0.15
+                    : 0,
+
                 0
             );
 
@@ -4047,6 +4103,10 @@
                 passive: true
             }
         );
+
+        // =====================================================
+        // ANIMATION
+        // =====================================================
 
         const clock =
             new THREE.Clock();
@@ -4089,9 +4149,7 @@
                         SPOTLIGHT_CONFIG
                             .model
                             .rotationY +
-
                         pointerRotation +
-
                         automaticRotation;
 
                     modelRig.rotation.x =
@@ -4146,6 +4204,10 @@
                 );
             }
         );
+
+        // =====================================================
+        // PUBLIC API
+        // =====================================================
 
         window.IPRobotXSpotlight =
         {
