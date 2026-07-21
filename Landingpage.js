@@ -2639,15 +2639,11 @@
         // =====================================================
 
         function getModelSize() {
-            if (
-                isMobile()
-            ) {
-                return 4.0;
+            if (isMobile()) {
+                return 2.65;
             }
 
-            if (
-                isTablet()
-            ) {
+            if (isTablet()) {
                 return SPOTLIGHT_CONFIG
                     .model
                     .tabletSize;
@@ -2663,15 +2659,11 @@
         // =====================================================
 
         function getCameraZ() {
-            if (
-                isMobile()
-            ) {
-                return 6.2;
+            if (isMobile()) {
+                return 7.8;
             }
 
-            if (
-                isTablet()
-            ) {
+            if (isTablet()) {
                 return SPOTLIGHT_CONFIG
                     .model
                     .cameraTabletZ;
@@ -2784,7 +2776,7 @@
         const camera =
             new THREE.PerspectiveCamera(
                 isMobile()
-                    ? 34
+                    ? 31
                     : 31,
 
                 initialSize.width /
@@ -3679,7 +3671,7 @@
                         .x,
 
                 isMobile()
-                    ? -0.28
+                    ? -0.05
                     : SPOTLIGHT_CONFIG
                         .model
                         .position

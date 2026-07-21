@@ -3326,3 +3326,405 @@ footer {
         opacity: 0.7 !important;
     }
 }
+
+/* =========================================================
+   FINAL MOBILE LAYOUT — IP ROBOTX
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    :root {
+        --nav-height: 72px;
+        --page-x: clamp(20px, 5.5vw, 30px);
+    }
+
+    /* =========================================
+       NAV
+       ========================================= */
+
+    nav {
+        min-height: var(--nav-height);
+        padding: max(14px, env(safe-area-inset-top)) var(--page-x) 14px;
+        background: linear-gradient( to bottom, rgba(8, 8, 8, 0.99) 0%, rgba(8, 8, 8, 0.88) 70%, rgba(8, 8, 8, 0) 100% );
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+
+    .logo {
+        font-size: 23px;
+        letter-spacing: 4px;
+    }
+
+    .nav-cta {
+        min-height: 42px;
+        padding: 10px 17px;
+        font-size: 9px;
+        letter-spacing: 1.6px;
+    }
+
+
+    /* =========================================
+       HERO
+       ROBOT FIRST
+       TEXT DIRECTLY BELOW
+       ========================================= */
+
+    #hero {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100%;
+        min-height: 0 !important;
+        height: auto !important;
+        padding-top: var(--nav-height);
+        overflow: hidden;
+        background: var(--black);
+    }
+
+
+    /* =========================================
+       ROBOT AREA
+       ========================================= */
+
+    #three-canvas {
+        position: relative !important;
+        inset: auto !important;
+        order: 1;
+        display: block;
+        width: 100% !important;
+        height: clamp( 430px, 104vw, 560px ) !important;
+        min-height: 430px !important;
+        flex: none;
+        z-index: 1;
+        background: radial-gradient( circle at 50% 52%, rgba(255, 74, 10, 0.075), transparent 45% ), #080808;
+    }
+
+
+    .hero-overlay-glow {
+        position: absolute;
+        top: var(--nav-height);
+        right: 0;
+        left: 0;
+        height: clamp( 430px, 104vw, 560px );
+        z-index: 2;
+        pointer-events: none;
+        background: radial-gradient( circle at 50% 55%, rgba(255, 90, 10, 0.1), transparent 38% ), linear-gradient( to bottom, rgba(8, 8, 8, 0.02), rgba(8, 8, 8, 0.02) 72%, rgba(8, 8, 8, 0.82) 100% );
+    }
+
+
+    #hero-model-status {
+        position: absolute;
+        top: calc( var(--nav-height) + 20px );
+        right: var(--page-x);
+        left: var(--page-x);
+        bottom: auto;
+        z-index: 6;
+        text-align: center;
+    }
+
+
+    /* =========================================
+       HERO TEXT
+       مباشرة تحت الروبوت
+       ========================================= */
+
+    .hero-content {
+        position: relative;
+        order: 2;
+        width: 100%;
+        padding: 28px var(--page-x) 56px;
+        z-index: 4;
+        background: radial-gradient( circle at 85% 20%, rgba(255, 74, 10, 0.05), transparent 36% ), #080808;
+    }
+
+
+    .hero-badge {
+        margin-bottom: 22px;
+        max-width: 100%;
+        font-size: 8px;
+        line-height: 1.6;
+        letter-spacing: 2px;
+        white-space: normal;
+    }
+
+
+    .hero-title {
+        max-width: 100%;
+        font-size: clamp( 54px, 16vw, 74px );
+        line-height: 0.9;
+        letter-spacing: 1.5px;
+    }
+
+
+    .hero-sub {
+        max-width: 100%;
+        margin-top: 26px;
+        font-size: 15px;
+        line-height: 1.7;
+    }
+
+
+    .hero-buttons {
+        display: flex;
+        width: 100%;
+        margin-top: 32px;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+
+        .hero-buttons .btn-primary,
+        .hero-buttons .btn-secondary {
+            width: 100%;
+            min-height: 54px;
+        }
+
+
+    /* =========================================
+       STATS
+       işletme gücünü artıran
+       مثل الرسم — بدون فراغات كبيرة
+       ========================================= */
+
+    .hero-stats {
+        position: relative !important;
+        inset: auto !important;
+        order: 3;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 54px var(--page-x) 60px;
+        gap: 28px 14px;
+        opacity: 1;
+        transform: none !important;
+        animation: none !important;
+        background: radial-gradient( circle at 20% 35%, rgba(255, 74, 10, 0.11), transparent 50% ), linear-gradient( 180deg, #1b0d09 0%, #160a07 100% );
+    }
+
+
+    .top-item {
+        position: static !important;
+        grid-column: 1 / -1;
+        width: 100%;
+        margin: 0 0 8px;
+        white-space: normal;
+    }
+
+
+    .satat-text {
+        max-width: 430px;
+        font-family: var(--font-display);
+        font-size: clamp( 24px, 7vw, 34px );
+        line-height: 1.12;
+        letter-spacing: 1.2px;
+        color: var(--silver);
+    }
+
+
+    .stat-item {
+        display: block;
+        width: 100%;
+        text-align: left;
+    }
+
+
+    .stat-num {
+        font-size: clamp( 42px, 11vw, 58px );
+        line-height: 0.9;
+    }
+
+
+    .stat-label {
+        margin-top: 12px;
+        font-size: 7px;
+        line-height: 1.4;
+        letter-spacing: 1.5px;
+        white-space: normal;
+    }
+
+
+    .scroll-indicator {
+        display: none;
+    }
+
+
+    /* =========================================
+       SECTIONS
+       ========================================= */
+
+    #workflow,
+    #spotlight,
+    #specs,
+    #final-cta {
+        padding-top: 82px;
+        padding-bottom: 82px;
+    }
+
+
+    /* =========================================
+       WORKFLOW
+       ========================================= */
+
+    .workflow-steps {
+        grid-template-columns: 1fr;
+        margin-top: 46px;
+        gap: 14px;
+    }
+
+
+    /* =========================================
+       SPOTLIGHT
+       ========================================= */
+
+    .spotlight-inner {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 28px;
+        margin-top: 40px;
+    }
+
+
+    #spotlight .spotlight-visual {
+        order: 1;
+        width: 100%;
+        height: 500px !important;
+        min-height: 500px !important;
+    }
+
+
+    .spotlight-inner > div:last-child {
+        order: 2;
+    }
+
+
+    .callout-list {
+        display: flex !important;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+
+    /* =========================================
+       SPOTLIGHT HOTSPOTS
+       ========================================= */
+
+    .hotspot-label {
+        display: block !important;
+        min-width: 80px;
+        max-width: 112px;
+        padding: 6px 8px;
+        font-size: 7px;
+        line-height: 1.2;
+        letter-spacing: 0.8px;
+        white-space: normal;
+    }
+
+
+    .hotspot-node {
+        width: 28px;
+        height: 28px;
+        font-size: 8px;
+    }
+
+
+    .hotspot-line {
+        opacity: 0.62 !important;
+    }
+
+
+    /* =========================================
+       SPECS
+       ========================================= */
+
+    .spec-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-top: 46px;
+    }
+
+
+    /* =========================================
+       FOOTER
+       ========================================= */
+
+    footer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 42px var(--page-x) calc( 42px + env( safe-area-inset-bottom ) );
+    }
+
+
+    .footer-contact {
+        text-align: center;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 640px) {
+
+    #three-canvas {
+        height: clamp( 420px, 108vw, 500px ) !important;
+        min-height: 420px !important;
+    }
+
+
+    .hero-overlay-glow {
+        height: clamp( 420px, 108vw, 500px );
+    }
+
+
+    .hero-content {
+        padding-top: 24px;
+        padding-bottom: 50px;
+    }
+
+
+    .hero-title {
+        font-size: clamp( 52px, 16.5vw, 70px );
+    }
+
+
+    .hero-stats {
+        padding-top: 48px;
+        padding-bottom: 54px;
+        gap: 26px 10px;
+    }
+
+
+    .satat-text {
+        font-size: clamp( 23px, 7vw, 30px );
+    }
+
+
+    .stat-num {
+        font-size: clamp( 40px, 11vw, 52px );
+    }
+
+
+    #spotlight .spotlight-visual {
+        height: 460px !important;
+        min-height: 460px !important;
+    }
+
+
+    .callout {
+        grid-template-columns: 38px 1fr;
+        gap: 14px;
+        padding: 20px 18px;
+    }
+
+
+    .callout-info h3 {
+        font-size: 21px;
+    }
+
+
+    .callout-info p {
+        font-size: 13px;
+    }
+}
