@@ -5290,6 +5290,122 @@
     }
 
     // =====================================================
+    // Workflow animation controller
+    // =====================================================
+
+    function initWorkflowMotion() {
+
+        const section =
+            document.getElementById(
+                "workflow"
+            );
+
+        if (!section) {
+            return;
+        }
+
+
+        const stages =
+            Array.from(
+                section.querySelectorAll(
+                    ".workflow-stage"
+                )
+            );
+
+
+        const arrows =
+            Array.from(
+                section.querySelectorAll(
+                    ".workflow-arrow"
+                )
+            );
+
+
+        stages.forEach(
+            (
+                stage,
+                index
+            ) => {
+
+                stage.style.setProperty(
+                    "--flow-index",
+                    index
+                );
+
+            }
+        );
+
+
+        arrows.forEach(
+            (
+                arrow,
+                index
+            ) => {
+
+                arrow.style.setProperty(
+                    "--arrow-index",
+                    index
+                );
+
+            }
+        );
+
+
+        if (
+            prefersReducedMotion ||
+            !(
+                "IntersectionObserver"
+                in window
+            )
+        ) {
+
+            section.classList.add(
+                "is-active"
+            );
+
+            return;
+        }
+
+
+        const observer =
+            new IntersectionObserver(
+
+                (
+                    entries
+                ) => {
+
+                    entries.forEach(
+                        (
+                            entry
+                        ) => {
+
+                            section.classList.toggle(
+                                "is-active",
+                                entry.isIntersecting
+                            );
+
+                        }
+                    );
+
+                },
+
+                {
+                    threshold: 0.12,
+
+                    rootMargin:
+                        "80px 0px 80px 0px"
+                }
+
+            );
+
+
+        observer.observe(
+            section
+        );
+
+    }
+
+    // =====================================================
     // Init
     // =====================================================
 

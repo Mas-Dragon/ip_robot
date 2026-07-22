@@ -3728,3 +3728,558 @@ footer {
         font-size: 13px;
     }
 }
+
+/* =========================================================
+   IP ROBOTX — WORKFLOW IMAGE SEQUENCE
+   ========================================================= */
+
+#workflow.workflow-showcase {
+    position: relative;
+    isolation: isolate;
+    padding: clamp(110px, 9vw, 150px) var(--page-x) clamp(110px, 9vw, 150px);
+    background: radial-gradient( circle at 12% 15%, rgba(255, 74, 10, 0.08), transparent 28% ), radial-gradient( circle at 86% 70%, rgba(255, 122, 32, 0.035), transparent 32% ), linear-gradient( 180deg, #0b0c0e 0%, #080808 100% );
+    overflow: hidden;
+}
+
+
+    /* الكبيرة بالخلفية */
+
+    #workflow.workflow-showcase::after {
+        content: "İŞLEM";
+        position: absolute;
+        right: 5vw;
+        top: 65px;
+        z-index: -1;
+        font-family: var(--font-display);
+        font-size: clamp(110px, 13vw, 230px);
+        line-height: 1;
+        letter-spacing: 8px;
+        color: rgba(255, 255, 255, 0.025);
+        pointer-events: none;
+    }
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.workflow-header {
+    position: relative;
+    z-index: 2;
+    max-width: 660px;
+}
+
+
+.workflow-kicker {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 22px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: rgba(240, 242, 245, 0.62);
+    text-transform: uppercase;
+}
+
+
+.workflow-section-number {
+    color: var(--ember);
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+
+.workflow-kicker-line {
+    width: 34px;
+    height: 1px;
+    background: linear-gradient( 90deg, var(--ember), rgba(255, 74, 10, 0) );
+}
+
+
+.workflow-main-title {
+    display: flex;
+    flex-direction: column;
+    font-family: var(--font-display);
+    font-size: clamp( 76px, 8vw, 132px );
+    line-height: 0.76;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+
+    .workflow-main-title span {
+        display: block;
+    }
+
+
+.workflow-white {
+    color: var(--white);
+}
+
+
+.workflow-orange {
+    color: var(--ember);
+}
+
+
+#workflow .workflow-intro {
+    max-width: 590px;
+    margin-top: 40px;
+    font-size: 17px;
+    line-height: 1.65;
+    color: rgba( 240, 242, 245, 0.68 );
+}
+
+
+/* =========================================================
+   MAIN FLOW
+   ========================================================= */
+
+.workflow-flow {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr) 64px minmax(0, 1fr) 64px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    width: 100%;
+    max-width: 1720px;
+    margin: clamp(70px, 7vw, 105px) auto 0;
+}
+
+
+/* =========================================================
+   INDIVIDUAL STEP
+   ========================================================= */
+
+.workflow-stage {
+    position: relative;
+    min-width: 0;
+}
+
+
+/* =========================================================
+   ROBOT IMAGE
+   ========================================================= */
+
+.workflow-machine {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 100%;
+    height: clamp( 340px, 29vw, 500px );
+}
+
+
+    /* الإضاءة تحت الروبوت */
+
+    .workflow-machine::before {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 10px;
+        width: 78%;
+        height: 70px;
+        transform: translateX(-50%);
+        background: radial-gradient( ellipse at center, rgba(255, 74, 10, 0.14), transparent 70% );
+        filter: blur(15px);
+        opacity: 0.65;
+        pointer-events: none;
+    }
+
+
+    .workflow-machine::after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        bottom: 14px;
+        width: 68%;
+        height: 18px;
+        transform: translateX(-50%);
+        background: radial-gradient( ellipse at center, rgba(0, 0, 0, 0.8), transparent 72% );
+        filter: blur(5px);
+        pointer-events: none;
+    }
+
+
+    .workflow-machine img {
+        position: relative;
+        z-index: 2;
+        display: block;
+        max-width: 100%;
+        width: auto;
+        height: 100%;
+        object-fit: contain;
+        filter: drop-shadow( 0 30px 35px rgba(0, 0, 0, 0.48) );
+        transform: translateY(0);
+        transition: transform 0.6s cubic-bezier( 0.22, 1, 0.36, 1 ), filter 0.6s ease;
+        animation: workflowRobotFloat 5.5s ease-in-out infinite;
+        animation-delay: calc( var(--flow-index, 0) * -0.65s );
+    }
+
+
+/* حركة خفيفة عند Hover */
+
+.workflow-stage:hover
+.workflow-machine img {
+    transform: translateY(-10px) scale(1.025);
+    filter: drop-shadow( 0 40px 45px rgba(0, 0, 0, 0.58) ) drop-shadow( 0 0 24px rgba(255, 74, 10, 0.07) );
+}
+
+
+@keyframes workflowRobotFloat {
+
+    0%, 100% {
+        translate: 0 0;
+    }
+
+    50% {
+        translate: 0 -7px;
+    }
+}
+
+
+/* =========================================================
+   STEP INFORMATION
+   ========================================================= */
+
+.workflow-step-info {
+    position: relative;
+    display: grid;
+    grid-template-columns: 68px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    margin-top: 22px;
+}
+
+
+/* =========================================================
+   ANIMATED NUMBER
+   ========================================================= */
+
+.workflow-number {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border: 1px solid rgba( 255, 74, 10, 0.72 );
+    border-radius: 50%;
+    background: rgba( 8, 8, 8, 0.74 );
+    box-shadow: inset 0 0 22px rgba( 255, 74, 10, 0.025 ), 0 0 22px rgba( 255, 74, 10, 0.05 );
+}
+
+
+    /* الحلقة المتحركة */
+
+    .workflow-number::before {
+        content: "";
+        position: absolute;
+        inset: -5px;
+        border-radius: 50%;
+        border: 1px solid transparent;
+        border-top-color: var(--ember);
+        border-right-color: rgba( 255, 122, 32, 0.28 );
+        animation: workflowNumberSpin 5s linear infinite;
+        animation-delay: calc( var(--flow-index, 0) * -0.7s );
+    }
+
+
+    /* نقطة صغيرة متحركة */
+
+    .workflow-number::after {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--glow);
+        box-shadow: 0 0 10px rgba( 255, 74, 10, 0.9 );
+    }
+
+
+    .workflow-number span {
+        display: block;
+        font-family: var(--font-display);
+        font-size: 34px;
+        line-height: 1;
+        color: var(--ember);
+        animation: workflowNumberPulse 2.6s ease-in-out infinite;
+        animation-delay: calc( var(--flow-index, 0) * 0.2s );
+    }
+
+
+@keyframes workflowNumberSpin {
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+@keyframes workflowNumberPulse {
+
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-2px) scale(1.08);
+    }
+}
+
+
+/* =========================================================
+   TEXT
+   ========================================================= */
+
+.workflow-text {
+    padding-top: 2px;
+}
+
+
+    .workflow-text h3 {
+        margin-bottom: 9px;
+        font-family: var(--font-display);
+        font-size: clamp( 23px, 1.65vw, 31px );
+        font-weight: 400;
+        line-height: 1.05;
+        letter-spacing: 0.8px;
+        color: var(--white);
+        text-transform: uppercase;
+    }
+
+
+    .workflow-text p {
+        max-width: 310px;
+        font-size: 14px;
+        line-height: 1.55;
+        color: rgba( 200, 205, 214, 0.68 );
+    }
+
+
+/* =========================================================
+   ANIMATED ARROWS
+   ========================================================= */
+
+.workflow-arrow {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: clamp( 340px, 29vw, 500px );
+    padding-top: 15px;
+}
+
+
+    .workflow-arrow span {
+        position: relative;
+        display: block;
+        width: 42px;
+        height: 1px;
+        background: linear-gradient( 90deg, rgba(255, 74, 10, 0.1), var(--ember), rgba(255, 122, 32, 0.9) );
+        box-shadow: 0 0 8px rgba( 255, 74, 10, 0.2 );
+        animation: workflowArrowGlow 1.8s ease-in-out infinite;
+        animation-delay: calc( var(--arrow-index, 0) * 0.22s );
+    }
+
+
+        /* رأس السهم */
+
+        .workflow-arrow span::after {
+            content: "";
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: 9px;
+            height: 9px;
+            border-top: 1px solid var(--ember);
+            border-right: 1px solid var(--ember);
+            transform: translateY(-50%) rotate(45deg);
+        }
+
+
+        /* النقطة المتحركة داخل السهم */
+
+        .workflow-arrow span::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 5px;
+            height: 5px;
+            margin-top: -2.5px;
+            border-radius: 50%;
+            background: var(--glow);
+            box-shadow: 0 0 8px var(--ember), 0 0 18px rgba( 255, 74, 10, 0.5 );
+            animation: workflowArrowTravel 1.8s cubic-bezier( 0.4, 0, 0.2, 1 ) infinite;
+            animation-delay: calc( var(--arrow-index, 0) * 0.22s );
+        }
+
+
+@keyframes workflowArrowTravel {
+
+    0% {
+        transform: translateX(0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    80% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateX(37px);
+        opacity: 0;
+    }
+}
+
+
+@keyframes workflowArrowGlow {
+
+    0%, 100% {
+        opacity: 0.38;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+
+/* =========================================================
+   STOP ANIMATION WHEN SECTION IS OUTSIDE VIEW
+   ========================================================= */
+
+#workflow:not(.is-active)
+.workflow-machine img,
+#workflow:not(.is-active)
+.workflow-number::before,
+#workflow:not(.is-active)
+.workflow-number span,
+#workflow:not(.is-active)
+.workflow-arrow span,
+#workflow:not(.is-active)
+.workflow-arrow span::before {
+    animation-play-state: paused;
+}
+
+
+/* =========================================================
+   TABLET / MOBILE
+   ========================================================= */
+
+@media (max-width: 1100px) {
+
+    .workflow-flow {
+        grid-template-columns: minmax( 0, 760px );
+        justify-content: center;
+        gap: 12px;
+    }
+
+
+    .workflow-stage {
+        width: 100%;
+    }
+
+
+    .workflow-machine {
+        height: clamp( 420px, 72vw, 620px );
+    }
+
+
+    .workflow-arrow {
+        height: 74px;
+        padding: 0;
+    }
+
+
+        .workflow-arrow span {
+            width: 48px;
+            transform: rotate(90deg);
+        }
+
+
+    .workflow-step-info {
+        max-width: 620px;
+        margin: 14px auto 0;
+    }
+
+
+    .workflow-text p {
+        max-width: 480px;
+    }
+}
+
+
+@media (max-width: 640px) {
+
+    #workflow.workflow-showcase {
+        padding-top: 78px;
+        padding-bottom: 88px;
+    }
+
+
+        #workflow.workflow-showcase::after {
+            top: 60px;
+            right: -40px;
+            font-size: 120px;
+        }
+
+
+    .workflow-main-title {
+        font-size: clamp( 66px, 21vw, 96px );
+    }
+
+
+    #workflow
+    .workflow-intro {
+        margin-top: 30px;
+        font-size: 15px;
+    }
+
+
+    .workflow-flow {
+        margin-top: 58px;
+    }
+
+
+    .workflow-machine {
+        height: clamp( 370px, 112vw, 520px );
+    }
+
+
+    .workflow-step-info {
+        grid-template-columns: 58px minmax(0, 1fr);
+        gap: 16px;
+    }
+
+
+    .workflow-number {
+        width: 56px;
+        height: 56px;
+    }
+
+
+        .workflow-number span {
+            font-size: 30px;
+        }
+
+
+    .workflow-text h3 {
+        font-size: clamp( 24px, 7vw, 31px );
+    }
+
+
+    .workflow-text p {
+        font-size: 14px;
+    }
+}
