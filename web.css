@@ -3746,7 +3746,7 @@ footer {
     #spotlight .section-texture,
     #workflow .section-texture,
     #final-cta .section-texture {
-        position: relative;
+        position: absolute;
         inset: 0;
         z-index: 0;
         pointer-events: none;
