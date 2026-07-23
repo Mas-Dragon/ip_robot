@@ -3787,6 +3787,70 @@ footer {
         inset: 0;
         z-index: 0;
         pointer-events: none;
-        opacity: 0.3;
+        opacity: 0.15;
         background-image: repeating-linear-gradient( 60deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 1px, transparent 1px, transparent 56px ), repeating-linear-gradient( -60deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 1px, transparent 1px, transparent 56px );
     }
+
+/* =========================================================
+   FINAL CTA — DEFINITIVE FIX
+   ========================================================= */
+
+#final-cta {
+    position: relative !important;
+    isolation: isolate;
+    overflow: hidden !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 140px var(--page-x) !important;
+}
+
+
+    /* التكتشر بالخلفية فقط */
+
+    #final-cta > .section-texture {
+        position: absolute !important;
+        inset: 0 !important;
+        z-index: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        pointer-events: none;
+    }
+
+
+    /* هذا هو سبب الفراغ — إجباره على الخروج من الـ Flow */
+
+    #final-cta > .cta-glow {
+        position: absolute !important;
+        width: min(620px, 90vw) !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
+        left: 50% !important;
+        top: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        margin: 0 !important;
+        transform: translate(-50%, -50%) !important;
+        z-index: 1 !important;
+        pointer-events: none;
+    }
+
+
+    /* المحتوى الحقيقي */
+
+    #final-cta > .reveal {
+        position: relative !important;
+        z-index: 2 !important;
+        margin: 0 !important;
+    }
+
+
+/* Mobile */
+
+@media (max-width: 900px) {
+
+    #final-cta {
+        min-height: 0 !important;
+        height: auto !important;
+        padding: 90px var(--page-x) !important;
+    }
+}
