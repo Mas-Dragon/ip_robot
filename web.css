@@ -759,7 +759,7 @@ section {
 }
 
 .cta-glow {
-    position: absolute;
+    position: relative;
     width: min(620px, 90vw);
     aspect-ratio: 1;
     left: 50%;
@@ -3761,9 +3761,32 @@ footer {
 
     /* إبقاء جميع العناصر فوق التكتشر */
 
+    /* إبقاء المحتوى فوق التكتشر بدون تخريب العناصر absolute */
+
     #spotlight > *:not(.section-texture),
-    #workflow > *:not(.section-texture),
-    #final-cta > *:not(.section-texture) {
+    #workflow > *:not(.section-texture) {
         position: relative;
         z-index: 1;
+    }
+
+    #final-cta > .reveal {
+        position: relative;
+        z-index: 2;
+    }
+
+    /* الإضاءة تبقى absolute مثل الأصل */
+    #final-cta .cta-glow {
+        position: absolute;
+        z-index: 1;
+    }
+
+    #spotlight .section-texture,
+    #workflow .section-texture,
+    #final-cta .section-texture {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.3;
+        background-image: repeating-linear-gradient( 60deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 1px, transparent 1px, transparent 56px ), repeating-linear-gradient( -60deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 1px, transparent 1px, transparent 56px );
     }
