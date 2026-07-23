@@ -3735,7 +3735,8 @@ footer {
 
 #spotlight,
 #workflow,
-#final-cta {
+#final-cta,
+#specs{
     position: relative;
     isolation: isolate;
 }
@@ -3745,7 +3746,8 @@ footer {
 
     #spotlight .section-texture,
     #workflow .section-texture,
-    #final-cta .section-texture {
+    #final-cta .section-texture,
+    #specs .section-texture{
         position: absolute;
         inset: 0;
         z-index: 0;
@@ -3764,7 +3766,8 @@ footer {
     /* إبقاء المحتوى فوق التكتشر بدون تخريب العناصر absolute */
 
     #spotlight > *:not(.section-texture),
-    #workflow > *:not(.section-texture) {
+    #workflow > *:not(.section-texture),
+    #specs > *:not(.section-texture){
         position: relative;
         z-index: 1;
     }
@@ -3782,7 +3785,8 @@ footer {
 
     #spotlight .section-texture,
     #workflow .section-texture,
-    #final-cta .section-texture {
+    #final-cta .section-texture,
+    #specs .section-texture{
         position: absolute;
         inset: 0;
         z-index: 0;
