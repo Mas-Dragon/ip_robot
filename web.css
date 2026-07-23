@@ -3729,3 +3729,41 @@ footer {
     }
 }
 
+/* =========================================================
+   SECTIONS 03 + 04 + 05 — TRIANGLE BACKGROUND TEXTURE
+   ========================================================= */
+
+#spotlight,
+#workflow,
+#final-cta {
+    position: relative;
+    isolation: isolate;
+}
+
+
+    /* Texture Layer */
+
+    #spotlight .section-texture,
+    #workflow .section-texture,
+    #final-cta .section-texture {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        /* نسبة الشفافية المطلوبة */
+        opacity: 0.3;
+        background-image: repeating-linear-gradient( 60deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 1px, transparent 1px, transparent 56px ), repeating-linear-gradient( -60deg, rgba(255, 255, 255, 0.07) 0, rgba(255, 255, 255, 0.07) 1px, transparent 1px, transparent 56px ), repeating-linear-gradient( 0deg, rgba(255, 255, 255, 0.035) 0, rgba(255, 255, 255, 0.035) 1px, transparent 1px, transparent 48.5px );
+        background-position: center center;
+        -webkit-mask-image: linear-gradient( to bottom, transparent 0%, black 8%, black 92%, transparent 100% );
+        mask-image: linear-gradient( to bottom, transparent 0%, black 8%, black 92%, transparent 100% );
+    }
+
+
+    /* إبقاء جميع العناصر فوق التكتشر */
+
+    #spotlight > *:not(.section-texture),
+    #workflow > *:not(.section-texture),
+    #final-cta > *:not(.section-texture) {
+        position: relative;
+        z-index: 1;
+    }
